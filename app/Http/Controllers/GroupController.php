@@ -19,7 +19,8 @@ class GroupController extends Controller
      */
     public function index()
     {
-        //
+      $groups = Group::all();
+      return $groups;
     }
 
     /**
@@ -29,7 +30,7 @@ class GroupController extends Controller
      */
     public function create()
     {
-        //
+      return view('groupCreate');
     }
 
     /**
