@@ -20,8 +20,9 @@ class GroupController extends Controller
      */
     public function index()
     {
-      $groups = Group::all();
-      return $groups;
+      //$groups = Group::all();
+      //return $groups;
+      return Auth::user()->groups;
     }
 
     /**
@@ -54,8 +55,9 @@ class GroupController extends Controller
         $response->groupName = $groupName;
         $group = new Group;
         $group->name = $groupName;
-        $group->user_id = $user->id;
+        $group->user_id = intval($user->id);
         $group->save();
+        return redirect('/groups');
       }else{
         $response->message = 'must specify new group name';
       }
@@ -70,7 +72,20 @@ class GroupController extends Controller
      */
     public function show(Group $group)
     {
-        //
+      $response = new \stdClass();
+      $response->error = true;
+      $response->message = 'message not set';
+      $response->message = 'request to show groupId: '.$group->id;
+      $response->group = $group;
+      $user = Auth::user();
+      $response->user = $user;
+      if(intval($user->id) == intval($group->user_id)){
+        $response->error = false;
+        $response->message = "this is your group";
+      }else{
+        $response->message = "this is not your group";
+      }
+      return response(json_encode($response))->header('Content-Type','application/json');
     }
 
     /**

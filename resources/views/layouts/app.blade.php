@@ -74,6 +74,9 @@
                                 <a class="dropdown-item" href="/groups/create">
                                   New...
                                 </a>
+                                @foreach (Auth::user()->groups as $group)
+                                  <a href="/groups/{{$group->id}}" class="dropdown-item">{{$group->name}}</a>
+                                @endforeach
                               </div>
                             </li>
                         @endguest
