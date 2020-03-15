@@ -52,6 +52,10 @@ class GroupController extends Controller
         $response->message = "will try to add group";
         $groupName = $request['name'];
         $response->groupName = $groupName;
+        $group = new Group;
+        $group->name = $groupName;
+        $group->user_id = $user->id;
+        $group->save();
       }else{
         $response->message = 'must specify new group name';
       }
