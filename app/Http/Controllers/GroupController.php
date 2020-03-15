@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Group;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class GroupController extends Controller
 {
@@ -41,7 +42,20 @@ class GroupController extends Controller
      */
     public function store(Request $request)
     {
-        //
+      $response = new \stdClass();
+      $response->error = true;
+      $response->message = 'message not set';
+      if($request['name']){
+        $user = Auth::user();
+        $response->user = $user;
+        $response->error = false;
+        $response->message = "will try to add group";
+        $groupName = $request['name'];
+        $response->groupName = $groupName;
+      }else{
+        $response->message = 'must specify new group name';
+      }
+      return response(json_encode($response))->header('Content-Type','application/json');
     }
 
     /**
