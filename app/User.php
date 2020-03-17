@@ -41,4 +41,9 @@ class User extends Authenticatable
     {
         return $this->belongsToMany('App\Group');
     }
+
+    public function groupsAdministrated()
+    {
+        return $this->belongsToMany('App\Group','group_admin');
+    }
 }

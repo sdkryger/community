@@ -23,7 +23,7 @@ class GroupController extends Controller
     {
       //$groups = Group::all();
       //return $groups;
-      return Auth::user()->groups;
+      return Auth::user()->groupsAdministrated;
       //return DB::table('group_user')->get();
     }
 
@@ -60,6 +60,7 @@ class GroupController extends Controller
         $group->created_by_id = intval($user->id);
         $group->save();
         $group->users()->save($user);
+        $group->admins()->save($user);
         
         return redirect('/groups');
       }else{
@@ -126,4 +127,5 @@ class GroupController extends Controller
     {
         //
     }
+
 }
