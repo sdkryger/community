@@ -5,6 +5,8 @@ namespace App;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Group;
+use App\GroupUser;
 
 class User extends Authenticatable
 {
@@ -37,13 +39,13 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function groups()
-    {
-        return $this->belongsToMany('App\Group');
-    }
-
-    public function groupsAdministrated()
-    {
-        return $this->belongsToMany('App\Group','group_admin');
+    public function groups(){
+      $groupUsers = GroupUser::where('user_id',$this->id)->get();
+      $groups = array();
+      foreach($groupUsers as $groupUser){
+        $group = Group::where('id',$groupUser->group_id)->first();
+        array_push($groups, $group);
+      }
+      return $groups;
     }
 }

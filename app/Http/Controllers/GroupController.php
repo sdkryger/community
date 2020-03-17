@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Group;
 use App\GroupJoinRequest;
+use App\GroupUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -24,7 +25,7 @@ class GroupController extends Controller
     {
       //$groups = Group::all();
       //return $groups;
-      return Auth::user()->groupsAdministrated;
+      return Auth::user()->groups();
       //return DB::table('group_user')->get();
     }
 
@@ -60,8 +61,11 @@ class GroupController extends Controller
         $group->name = $groupName;
         $group->created_by_id = intval($user->id);
         $group->save();
-        $group->users()->save($user);
-        $group->admins()->save($user);
+        $groupUser = new GroupUser;
+        $groupUser->user_id = $user->id;
+        $groupUser->group_id = $group->id;
+        $groupUser->is_admin = true;
+        $groupUser->save();
         
         return redirect('/groups');
       }else{
