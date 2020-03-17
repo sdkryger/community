@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\GroupJoinRequest;
 
 class HomeController extends Controller
 {
@@ -23,6 +25,11 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+      $groups = Auth::user()->groups();
+      for($i = 0;$i<count($groups);$i++){
+        $groups[$i]['somethingElse'] = '$i:'.$i;
+        $groups[$i]['joinRequests'] = GroupJoinRequest::where('group_id',$groups[$i]->id)->count();
+      }
+      return view('home',['groups'=>$groups]);
     }
 }

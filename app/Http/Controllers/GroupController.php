@@ -67,7 +67,7 @@ class GroupController extends Controller
         $groupUser->is_admin = true;
         $groupUser->save();
         
-        return redirect('/groups');
+        return redirect('/home');
       }else{
         $response->message = 'must specify new group name';
       }
@@ -138,6 +138,11 @@ class GroupController extends Controller
     }
 
     public function joinRequest(Request $request){
+      
+      $joinRequest = new GroupJoinRequest;
+      $joinRequest->group_id = $request['id'];
+      $joinRequest->requester_id = Auth::User()->id;
+      $joinRequest->save();
       echo 'Request to join group: '.$request['id'];
     }
 }

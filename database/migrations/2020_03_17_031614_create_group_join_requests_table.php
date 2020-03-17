@@ -15,9 +15,7 @@ class CreateGroupJoinRequestsTable extends Migration
     {
         Schema::create('group_join_requests', function (Blueprint $table) {
             $table->id();
-            $table->integer('admin_id');
             $table->integer('requester_id');
-            $table->string('requester_name');
             $table->integer('group_id');
             $table->softDeletes();
             $table->timestamps();

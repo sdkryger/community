@@ -2,6 +2,7 @@
 
 @section('content')
 <div class="container">
+  <home-component :groups='{!! json_encode($groups) !!}'></home-component>
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
@@ -15,6 +16,11 @@
                     @endif
 
                     You are logged in!
+                    <br>
+                    Groups:
+                    @foreach(Auth::user()->groups() as $group)
+                      <a href="/groups/{{$group->id}}">{{$group->name}}</a>
+                    @endforeach
                 </div>
             </div>
         </div>
