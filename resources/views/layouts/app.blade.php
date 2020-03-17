@@ -74,6 +74,9 @@
                                 <a class="dropdown-item" href="/groups/create">
                                   New...
                                 </a>
+                                <a class="dropdown-item" href="/groups/join">
+                                  Join...
+                                </a>
                                 @foreach (Auth::user()->groupsAdministrated as $group)
                                   <a class="dropdown-item" href="/groups/{{$group->id}}">{{$group->name}}</a>
                                 @endforeach

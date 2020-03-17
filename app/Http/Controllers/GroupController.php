@@ -128,4 +128,11 @@ class GroupController extends Controller
         //
     }
 
+    public function join(){
+      return view('groupJoin');
+    }
+
+    public function joinRequest(Request $request){
+      echo 'Request to join group: '.$request['id'];
+    }
 }
