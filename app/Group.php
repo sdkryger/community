@@ -9,8 +9,8 @@ class Group extends Model
 {
   use SoftDeletes;
 
-  public function user()
+  public function users()
   {
-    return $this->belongsTo('App\User');
+    return $this->belongsToMany('App\User');
   }
 }
