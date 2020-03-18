@@ -168,5 +168,34 @@ class GroupController extends Controller
 
       return response(json_encode($response))->header('Content-Type','application/json');
     }
+
+    public function setAdmin(Request $request){
+      $response = new \stdClass();
+      $response->error = true;
+      $response->message = 'Not group admin or did not set groupId, memberId and isAdmin';
+      $user_id = Auth::user()->id;
+      if(isset($request['groupId']) and isset($request['memberId']) and isset($request['isAdmin'])){
+        //$response->message = "must set groupId, memberId and isAdmin";
+        $groupAdmin = GroupUser::where('group_id',$request['groupId'])->where('user_id',$user_id)->where('is_admin',1)->first();
+        $groupMember = GroupUser::where('group_id',$request['groupId'])->where('user_id',$request['memberId'])->first();
+        $response->groupAdmin = $groupAdmin;
+        $response->groupMember = $groupMember;
+        $isAdmin = $request['isAdmin'];
+      }else{
+        $groupAdmin = null;
+        $groupMember = null;
+      }
+        
+      
+      if($groupAdmin and $groupMember){
+        $groupMember->is_admin = $isAdmin=='true';
+        $groupMember->save();
+        return $groupMember;
+      }else{
+        return response(json_encode($response))->header('Content-Type','application/json');
+      }
+      
+
+    }
 }
 

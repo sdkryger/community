@@ -1958,6 +1958,16 @@ __webpack_require__.r(__webpack_exports__);
     },
     setAdmin: function setAdmin(index) {
       console.log("should open set admin dialog for member: " + JSON.stringify(this.members[index]));
+      var self = this;
+      $.get('/groups/setAdmin', {
+        groupId: self.group.id,
+        memberId: self.members[index].user_id,
+        isAdmin: self.members[index].is_admin
+      }, function (data) {
+        if (data.error) {
+          console.log("set admin error: " + data.message);
+        } else self.updateMemberList();
+      }, 'json');
     }
   }
 });

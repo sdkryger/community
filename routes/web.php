@@ -24,4 +24,5 @@ Route::get('/home', 'HomeController@index')->name('home');
 Route::get('/groups/join', 'GroupController@join');
 Route::post('/groups/joinRequest', 'GroupController@joinRequest');
 Route::get('/groups/members/{id}', 'GroupController@members');
+Route::get('/groups/setAdmin', 'GroupController@setAdmin');
 Route::resource('groups', 'GroupController');
