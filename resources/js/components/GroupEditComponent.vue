@@ -1,27 +1,58 @@
 <template>
-  <div class="card">
-    <div class="card-header">Edit group</div>
-
-    <div class="card-body">
-      <form method="POST" action="/groups">
-        
-
-        <div class="form-group row">
-          <label for="name" class="col-md-4 col-form-label text-md-right">Name</label>
-          <div class="col-md-6">
-            <input id="name" type="text" class="form-control" name="name" required autocomplete="name" autofocus>
-          </div>
+  <div class="row">
+    <div class="col-12">
+      <div class="row">
+        <div class="col h3">
+          Edit Group - {{group.name}}
         </div>
-        <div class="form-group row mb-0">
-          <div class="col-md-8 offset-md-4">
-            <button type="submit" class="btn btn-primary">
-              Create group
-            </button>                                
+      </div>
+      <div class="row">
+        <div class="col">
+          <div class="h5">
+            Members
           </div>
+          <ul class="list-group">
+            <li class="list-group-item" v-for="(member, index) in members">
+              Name: {{member.name}}, Admin: <input type="checkbox" v-model="member.is_admin" @change="setAdmin(index)">
+            </li>
+          </ul>
         </div>
-
-      </form>
-                  
+      </div>
     </div>
   </div>
 </template>
+
+<script>
+  export default{
+    props:['group'],
+    data(){
+      return{
+        members:[]
+      }
+    },
+    mounted(){
+      console.log("group edit mounted");
+      this.updateMemberList();
+    },
+    methods:{
+      updateMemberList(){
+        var self = this;
+        $.get(
+          '/groups/members/'+this.group.id,
+          function(data){
+            console.log(JSON.stringify(data));
+            if(data.error){
+              alert("error getting member list");
+            }else{
+              self.members = data.groupMembers;
+            }
+          },
+          'json'
+        );
+      },
+      setAdmin(index){
+        console.log("should open set admin dialog for member: "+JSON.stringify(this.members[index]));
+      }
+    }
+  }
+</script>

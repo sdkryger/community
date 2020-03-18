@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Group;
+use App\User;
 use App\GroupJoinRequest;
 use App\GroupUser;
 use Illuminate\Http\Request;
@@ -89,14 +90,15 @@ class GroupController extends Controller
       $response->group = $group;
       $user = Auth::user();
       $response->user = $user;
-      if(intval($user->id) == intval($group->created_by_id)){
+      $groupUser = GroupUser::where('group_id',$group->id)->where('user_id',$user->id)->where('is_admin',1)->first();
+      if($groupUser){
         $response->error = false;
         $response->message = "this is your group";
       }else{
         $response->message = "this is not your group";
         return redirect('/groups');
       }
-      return response(json_encode($response))->header('Content-Type','application/json');
+      return view('groupEdit',['group'=>$group]);
     }
 
     /**
@@ -145,4 +147,26 @@ class GroupController extends Controller
       $joinRequest->save();
       echo 'Request to join group: '.$request['id'];
     }
+
+    public function members(Request $request, $id){
+      $response = new \stdClass();
+      $response->error = true;
+      $response->message = 'Not group admin';
+      $user_id = Auth::user()->id;
+      $groupUser = GroupUser::where('group_id',$id)->where('user_id',$user_id)->where('is_admin',1)->first();
+      if($groupUser){
+        //user is admin of the group
+        $response->error = false;
+        $response->message = 'Should return list of members';
+        $groupUsers = GroupUser::where('group_id',$id)->get();
+        for($i = 0;$i<count($groupUsers);$i++){
+          $groupUsers[$i]->is_admin = $groupUsers[$i]->is_admin == '1';
+          $groupUsers[$i]->name = User::where('id',$groupUsers[$i]->user_id)->first()->name;
+        }
+        $response->groupMembers = $groupUsers;
+      }
+
+      return response(json_encode($response))->header('Content-Type','application/json');
+    }
 }
+
