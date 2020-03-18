@@ -15,12 +15,17 @@ use Illuminate\Http\Request;
 */
 
 Route::get('/', function () {
+  if(Auth::user())
+    return redirect('/home');
+  else
     return view('welcome');
 });
 
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
+Route::get('/groups/getJoinRequests/{id}','GroupController@getJoinRequests');
+Route::get('/groups/processJoinRequest/{id}','GroupController@processJoinRequest');
 Route::get('/groups/join', 'GroupController@join');
 Route::post('/groups/joinRequest', 'GroupController@joinRequest');
 Route::get('/groups/members/{id}', 'GroupController@members');

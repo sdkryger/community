@@ -197,5 +197,59 @@ class GroupController extends Controller
       
 
     }
+
+    public function getJoinRequests($id){
+      $response = new \stdClass();
+      $response->error = true;
+      $response->message = 'Not group admin';
+      $user_id = Auth::user()->id;
+      $groupUser = GroupUser::where('group_id',$id)->where('user_id',$user_id)->where('is_admin',1)->first();
+      if($groupUser){
+        $requests = array();
+        $joinRequests = GroupJoinRequest::where('group_id',$id)->get();
+        for($i = 0; $i<count($joinRequests);$i++){
+          $joinRequests[$i]->name = User::where('id',$joinRequests[$i]->requester_id)->first()->name;
+          $request = new \stdClass();
+          $request->id = $joinRequests[$i]->requester_id;
+          $request->name = User::where('id',$joinRequests[$i]->requester_id)->first()->name;
+          array_push($requests,$request);
+        }
+        //$response->joinRequests = $joinRequests;
+        $response->joinRequesters = $requests;
+        $response->error = false;
+        $response->message = 'success';
+      }
+      return response(json_encode($response))->header('Content-Type','application/json');
+
+    }
+
+    public function processJoinRequest(Request $request, $id){
+      $response = new \stdClass();
+      $response->error = true;
+      $response->message = "must specify groupId, userId and action";
+      if(isset($request['userId']) and isset($request['action'])){
+        $response->message = 'Not group admin';
+        $groupId = $id;
+        $requesterId = $request['userId'];
+        $action = $request['action'];
+        $userId = Auth::user()->id;
+        $groupUser = GroupUser::where('group_id',$groupId)->where('user_id',$userId)->where('is_admin',1)->first();
+        if($groupUser){
+          $request = GroupJoinRequest::where('group_id',$groupId)->where('requester_id',$requesterId)->first();
+          $request->delete();
+          if($action=='approve'){
+            $groupUser = new GroupUser;
+            $groupUser->user_id = $requesterId;
+            $groupUser->group_id = $groupId;
+            $groupUser->is_admin = false;
+            $groupUser->save();
+          }
+          $response->error = false;
+          $response->message = 'success';
+        }
+      }
+      
+      return response(json_encode($response))->header('Content-Type','application/json');
+    }
 }
 

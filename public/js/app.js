@@ -1932,27 +1932,72 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['group'],
   data: function data() {
     return {
-      members: []
+      members: [],
+      joinRequesters: []
     };
   },
   mounted: function mounted() {
     console.log("group edit mounted");
     this.updateMemberList();
+    this.updateRequesterList();
   },
   methods: {
+    joinRequest: function joinRequest(action, userId) {
+      console.log("Should " + action + " the request from user with id: " + userId);
+      var self = this;
+      $.get('/groups/processJoinRequest/' + this.group.id, {
+        userId: userId,
+        action: action
+      }, function (data) {
+        console.log(JSON.stringify(data));
+
+        if (data.error) {
+          console.log("error processing join request: " + data.message);
+        } else {
+          self.updateMemberList();
+          self.updateRequesterList();
+        }
+      }, 'json');
+    },
     updateMemberList: function updateMemberList() {
       var self = this;
       $.get('/groups/members/' + this.group.id, function (data) {
         console.log(JSON.stringify(data));
 
         if (data.error) {
-          alert("error getting member list");
+          console.log("error getting member list: " + data.message);
         } else {
           self.members = data.groupMembers;
+        }
+      }, 'json');
+    },
+    updateRequesterList: function updateRequesterList() {
+      var self = this;
+      $.get('/groups/getJoinRequests/' + this.group.id, function (data) {
+        console.log(JSON.stringify(data));
+
+        if (data.error) {
+          console.log("error getting requesters: " + data.error);
+        } else {
+          self.joinRequesters = data.joinRequesters;
         }
       }, 'json');
     },
@@ -37388,7 +37433,11 @@ var render = function() {
       _c("div", { staticClass: "row" }, [
         _c("div", { staticClass: "col h3" }, [
           _vm._v(
-            "\n        Edit Group - " + _vm._s(_vm.group.name) + "\n      "
+            "\n        Edit Group - Name: " +
+              _vm._s(_vm.group.name) +
+              " - Number: " +
+              _vm._s(_vm.group.id) +
+              "\n      "
           )
         ])
       ]),
@@ -37452,6 +37501,54 @@ var render = function() {
                     ]
                   }
                 })
+              ])
+            }),
+            0
+          )
+        ])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "row" }, [
+        _c("div", { staticClass: "col" }, [
+          _c("div", { staticClass: "h5" }, [
+            _vm._v("\n          Join requests\n        ")
+          ]),
+          _vm._v(" "),
+          _c(
+            "ul",
+            { staticClass: "list-group" },
+            _vm._l(_vm.joinRequesters, function(request, index) {
+              return _c("li", { staticClass: "list-group-item" }, [
+                _vm._v(
+                  "\n            Name: " +
+                    _vm._s(request.name) +
+                    " \n            "
+                ),
+                _c(
+                  "div",
+                  {
+                    staticClass: "btn btn-primary",
+                    on: {
+                      click: function($event) {
+                        return _vm.joinRequest("approve", request.id)
+                      }
+                    }
+                  },
+                  [_vm._v("Approve")]
+                ),
+                _vm._v(" "),
+                _c(
+                  "div",
+                  {
+                    staticClass: "btn btn-primary",
+                    on: {
+                      click: function($event) {
+                        return _vm.joinRequest("deny", request.id)
+                      }
+                    }
+                  },
+                  [_vm._v("Deny")]
+                )
               ])
             }),
             0
