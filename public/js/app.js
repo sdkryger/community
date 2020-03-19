@@ -2129,12 +2129,14 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['resource'],
   mounted: function mounted() {
     var self = this;
     var self = this;
-    $.get('/groups', function (data) {
+    $.get('/resources/groups/' + this.resource.id, function (data) {
       self.groups = data;
     }, 'json');
   },
@@ -37809,8 +37811,16 @@ var render = function() {
         _vm._m(1),
         _vm._v(" "),
         _vm._l(_vm.groups, function(group) {
-          return _c("div", { staticClass: "row" }, [
-            _vm._v("\n      " + _vm._s(group.name) + "\n    ")
+          return _c("div", { staticClass: "row mt-1" }, [
+            _c("span", [_vm._v(_vm._s(group.name))]),
+            _vm._v(" "),
+            group.access
+              ? _c("div", { staticClass: "btn btn-primary btn-sm" }, [
+                  _vm._v("Remove from group")
+                ])
+              : _c("div", { staticClass: "btn btn-primary btn-sm" }, [
+                  _vm._v("Let group access this")
+                ])
           ])
         })
       ],

@@ -13,8 +13,10 @@
       <div class="row">
         <label>Groups</label>
       </div>
-      <div class="row" v-for="group in groups">
-        {{group.name}}
+      <div class="row mt-1" v-for="group in groups">
+        <span>{{group.name}}</span>
+        <div class="btn btn-primary btn-sm" v-if="group.access">Remove from group</div>
+        <div class="btn btn-primary btn-sm" v-else>Let group access this</div>
       </div>
     </div>
   </div>
@@ -27,7 +29,7 @@
       var self = this;
       var self = this;
       $.get(
-        '/groups',
+        '/resources/groups/'+this.resource.id,
         function(data){
           self.groups = data;
         },
