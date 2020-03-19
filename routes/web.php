@@ -31,3 +31,6 @@ Route::post('/groups/joinRequest', 'GroupController@joinRequest');
 Route::get('/groups/members/{id}', 'GroupController@members');
 Route::get('/groups/setAdmin', 'GroupController@setAdmin');
 Route::resource('groups', 'GroupController');
+
+Route::get('/resources','ResourceController@listResources');
+Route::get('/myResources','ResourceController@myResources');

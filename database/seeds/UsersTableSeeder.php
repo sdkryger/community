@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Seeder;
 use App\User;
+use App\Resource;
 use Illuminate\Support\Facades\Hash;
 
 class UsersTableSeeder extends Seeder
@@ -25,5 +26,8 @@ class UsersTableSeeder extends Seeder
       $user2->password = Hash::make('password');
       $user2->save();
 
+      $resource = new Resource;
+      $resource->title = 'Canoe';
+      $user1->resources()->save($resource);
     }
 }

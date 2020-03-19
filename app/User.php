@@ -48,4 +48,8 @@ class User extends Authenticatable
       }
       return $groups;
     }
+
+    public function resources(){
+      return $this->hasMany('App\Resource');
+    }
 }
