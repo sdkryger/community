@@ -21,6 +21,7 @@ window.Vue = require('vue');
 
 Vue.component('group-edit-component', require('./components/GroupEditComponent.vue').default);
 Vue.component('home-component', require('./components/HomeComponent.vue').default);
+Vue.component('resource-edit-component', require('./components/ResourceEditComponent.vue').default);
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to

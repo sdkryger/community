@@ -14,6 +14,16 @@
           <span class="badge badge-pill badge-secondary">Members: {{group.numberOfMembers}}</span>
         </div>
       </div>
+      <div class="row mt-2">
+        <div class="col h3">
+          My resources
+        </div>
+      </div>
+      <div class="row" v-for="resource in myResources">
+        <div class="col" @click="editResource(resource.id)" style="cursor:pointer;">
+          {{resource.title}}
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -23,15 +33,20 @@
     data(){
       return{
         message:'home component',
-        groups:[]
+        groups:[],
+        myResources:[]
       }
     },
     methods:{
       editGroup(isAdmin,id){
         if(isAdmin){
-          var url = 'groups/'+id;
+          var url = '/groups/'+id;
           window.open(url,'_self');
         }
+      },
+      editResource(id){
+        var url = '/resources/'+id;
+        window.open(url,'_self');
       },
       updateGroupList(){
         var self = this;
@@ -42,10 +57,21 @@
           },
           'json'
         )
+      },
+      updateMyResources(){
+        var self = this;
+        $.get(
+          '/myResources',
+          function(data){
+            self.myResources = data;
+          },
+          'json'
+        )
       }
     },
     mounted(){
       this.updateGroupList();
+      this.updateMyResources();
     }
   }
 </script>
