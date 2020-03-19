@@ -2041,18 +2041,36 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      message: 'home component'
+      message: 'home component',
+      groups: []
     };
   },
-  props: ['groups'],
   methods: {
-    editGroup: function editGroup(id) {
-      var url = 'groups/' + id;
-      window.open(url, '_self');
+    editGroup: function editGroup(isAdmin, id) {
+      if (isAdmin) {
+        var url = 'groups/' + id;
+        window.open(url, '_self');
+      }
+    },
+    updateGroupList: function updateGroupList() {
+      var self = this;
+      $.get('/groups', function (data) {
+        self.groups = data;
+      }, 'json');
     }
+  },
+  mounted: function mounted() {
+    this.updateGroupList();
   }
 });
 
@@ -37584,46 +37602,65 @@ var render = function() {
     _c(
       "div",
       { staticClass: "col" },
-      _vm._l(_vm.groups, function(group) {
-        return _c("div", { staticClass: "row" }, [
-          _c(
-            "div",
-            {
-              staticClass: "col",
-              staticStyle: { cursor: "pointer" },
-              on: {
-                click: function($event) {
-                  return _vm.editGroup(group.id)
+      [
+        _vm._m(0),
+        _vm._v(" "),
+        _vm._l(_vm.groups, function(group) {
+          return _c("div", { staticClass: "row" }, [
+            _c(
+              "div",
+              {
+                staticClass: "col",
+                staticStyle: { cursor: "pointer" },
+                on: {
+                  click: function($event) {
+                    return _vm.editGroup(group.isAdmin, group.id)
+                  }
                 }
-              }
-            },
-            [
-              _c("span", [
-                _vm._v(
-                  "groupId: " +
-                    _vm._s(group.id) +
-                    ", name: " +
-                    _vm._s(group.name) +
-                    " "
+              },
+              [
+                _c("span", [_vm._v(_vm._s(group.name) + " ")]),
+                _vm._v(" "),
+                group.isAdmin
+                  ? _c(
+                      "span",
+                      { staticClass: "badge badge-pill badge-primary" },
+                      [_vm._v("Admin")]
+                    )
+                  : _vm._e(),
+                _vm._v(" "),
+                group.joinRequests > 0
+                  ? _c(
+                      "span",
+                      { staticClass: "badge badge-pill badge-primary" },
+                      [_vm._v("Join requests: " + _vm._s(group.joinRequests))]
+                    )
+                  : _vm._e(),
+                _vm._v(" "),
+                _c(
+                  "span",
+                  { staticClass: "badge badge-pill badge-secondary" },
+                  [_vm._v("Members: " + _vm._s(group.numberOfMembers))]
                 )
-              ]),
-              _vm._v(" "),
-              group.joinRequests > 0
-                ? _c(
-                    "span",
-                    { staticClass: "badge badge-pill badge-primary" },
-                    [_vm._v("Join requests: " + _vm._s(group.joinRequests))]
-                  )
-                : _vm._e()
-            ]
-          )
-        ])
-      }),
-      0
+              ]
+            )
+          ])
+        })
+      ],
+      2
     )
   ])
 }
-var staticRenderFns = []
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "row" }, [
+      _c("div", { staticClass: "col h3" }, [_vm._v("\n        Groups\n      ")])
+    ])
+  }
+]
 render._withStripped = true
 
 

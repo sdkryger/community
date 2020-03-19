@@ -77,9 +77,7 @@
                                 <a class="dropdown-item" href="/groups/join">
                                   Join...
                                 </a>
-                                @foreach (Auth::user()->groups() as $group)
-                                  <a class="dropdown-item" href="/groups/{{$group->id}}">{{$group->name}}</a>
-                                @endforeach
+                                
                               </div>
                             </li>
                         @endguest

@@ -24,10 +24,14 @@ class GroupController extends Controller
      */
     public function index()
     {
-      //$groups = Group::all();
-      //return $groups;
-      return Auth::user()->groups();
-      //return DB::table('group_user')->get();
+      $groups = Auth::user()->groups();
+      for($i=0;$i<count($groups);$i++){
+        $groups[$i]->isAdmin = GroupUser::where('group_id',$groups[$i]->id)->where('user_id',Auth::user()->id)->first()->is_admin == 1;
+        if($groups[$i]->isAdmin)
+          $groups[$i]->joinRequests = count(GroupJoinRequest::where('group_id',$groups[$i]->id)->get());
+        $groups[$i]->numberOfMembers = count(GroupUser::where('group_id',$groups[$i]->id)->get());
+      }
+      return $groups;
     }
 
     /**
@@ -96,7 +100,7 @@ class GroupController extends Controller
         $response->message = "this is your group";
       }else{
         $response->message = "this is not your group";
-        return redirect('/groups');
+        return redirect('/home');
       }
       return view('groupEdit',['group'=>$group]);
     }
@@ -145,7 +149,7 @@ class GroupController extends Controller
       $joinRequest->group_id = $request['id'];
       $joinRequest->requester_id = Auth::User()->id;
       $joinRequest->save();
-      echo 'Request to join group: '.$request['id'];
+      return redirect('/home');
     }
 
     public function members(Request $request, $id){
