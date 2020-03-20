@@ -2,6 +2,6 @@
 
 @section('content')
 <div class="container">
-  <resource-edit-component :resource="{{$resource}}"></resource-edit-component>
+  <resource-edit-component :resource="{{$resource}}" csrf="{{csrf_token()}}"></resource-edit-component>
 </div>
 @endsection

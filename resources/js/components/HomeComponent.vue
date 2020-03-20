@@ -36,7 +36,7 @@
             </div>
           </div>
           <div class="card-footer">
-            <a class="btn btn-primary" role="button" href="/resources/create">New</a>
+            <a class="btn btn-primary" role="button" href="/resources/-1">New</a>
           </div>
         </div>
       </div>

@@ -20,7 +20,14 @@ class ResourceController extends Controller
   }
 
   public function show($id){
-    $resource = Resource::where('id',$id)->where('user_id',Auth::user()->id)->first();
+    if($id == -1){
+      $resource = new Resource;
+      $resource->new = true;
+      $resource->title = '';
+      $resource->id = -1;
+    }
+    else
+      $resource = Resource::where('id',$id)->where('user_id',Auth::user()->id)->first();
     if(!$resource){
       $resource = new Resource;
       $resource->title = 'Access denied';
@@ -84,7 +91,34 @@ class ResourceController extends Controller
     //echo "should list groups for resource with id: ".$id;
   }
 
-  public function create(){
-    return view('resourceCreate');
+  public function update($id, Request $request){
+
+    $response = new \stdClass();
+    $response->error = true;
+    $response->message = 'unable to update resource with id: '.$id;
+    $user = Auth::user();
+    if(isset($request['title'])){
+      $title = $request['title'];
+      if($id == -1){
+        //new resource
+        $response->message = 'will try to create new resource with id: '.$id.' and title: '.$title;
+        $resource = new Resource;
+        $resource->title = $title;
+        Auth::user()->resources()->save($resource);
+        return $resource;
+      }else{
+        $response->message = 'will try to update resource with id: '.$id.' and title: '.$title;
+        $resource = Resource::where('id',$id)->where('user_id',$user->id)->first();
+        if($resource){
+          $resource->title = $title;
+          $resource->save();
+          return $resource;
+        }else{
+          $response->message = 'This resource does not belong to you';
+        }
+      }
+      
+    }
+    return response(json_encode($response))->header('Content-Type','application/json');
   }
 }

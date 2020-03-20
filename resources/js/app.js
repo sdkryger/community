@@ -21,7 +21,6 @@ window.Vue = require('vue');
 
 Vue.component('group-edit-component', require('./components/GroupEditComponent.vue').default);
 Vue.component('home-component', require('./components/HomeComponent.vue').default);
-Vue.component('resource-create-component', require('./components/ResourceCreateComponent.vue').default);
 Vue.component('resource-edit-component', require('./components/ResourceEditComponent.vue').default);
 
 /**

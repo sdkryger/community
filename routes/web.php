@@ -33,9 +33,9 @@ Route::get('/groups/setAdmin', 'GroupController@setAdmin');
 Route::resource('groups', 'GroupController');
 
 Route::get('/resources','ResourceController@listResources');
-Route::get('/resources/create','ResourceController@create');
 Route::get('/myResources','ResourceController@myResources');
 Route::get('/resources/groupAssignment','ResourceController@groupAssignment');
 Route::get('/resources/groups/{id}','ResourceController@listGroups');
 Route::get('/resources/{id}','ResourceController@show');
+Route::put('/resources/{id}','ResourceController@update');
 
