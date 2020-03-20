@@ -2150,6 +2150,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['resource', 'csrf'],
   mounted: function mounted() {
@@ -2159,10 +2161,29 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {
       groups: [],
-      title: ''
+      title: '',
+      deleteInProgress: false
     };
   },
   methods: {
+    deleteResource: function deleteResource() {
+      var self = this;
+
+      if (this.deleteInProgress) {
+        $.ajax({
+          method: 'DELETE',
+          url: '/resources/' + self.resource.id,
+          data: {
+            _token: self.csrf
+          },
+          dataType: 'json'
+        }).done(function () {
+          window.open('/home', '_self');
+        });
+      } else {
+        this.deleteInProgress = true;
+      }
+    },
     setGroupAccess: function setGroupAccess(index) {
       var resourceId = this.resource.id;
       var groupId = this.groups[index].id;
@@ -37940,7 +37961,41 @@ var render = function() {
                 }
               },
               [_vm._v("Save")]
-            )
+            ),
+            _vm._v(" "),
+            _c(
+              "div",
+              {
+                staticClass: "btn",
+                class: [_vm.deleteInProgress ? "btn-danger" : "btn-primary"],
+                on: {
+                  click: function($event) {
+                    return _vm.deleteResource()
+                  }
+                }
+              },
+              [
+                _vm.deleteInProgress
+                  ? _c("span", [_vm._v("Confirm ")])
+                  : _vm._e(),
+                _vm._v("Delete")
+              ]
+            ),
+            _vm._v(" "),
+            _vm.deleteInProgress
+              ? _c(
+                  "div",
+                  {
+                    staticClass: "btn btn-primary",
+                    on: {
+                      click: function() {
+                        _vm.deleteInProgress = false
+                      }
+                    }
+                  },
+                  [_vm._v("Cancel delete")]
+                )
+              : _vm._e()
           ])
         ]),
         _vm._v(" "),

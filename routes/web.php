@@ -38,4 +38,5 @@ Route::get('/resources/groupAssignment','ResourceController@groupAssignment');
 Route::get('/resources/groups/{id}','ResourceController@listGroups');
 Route::get('/resources/{id}','ResourceController@show');
 Route::put('/resources/{id}','ResourceController@update');
+Route::delete('/resources/{id}','ResourceController@destroy');
 

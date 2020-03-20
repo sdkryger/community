@@ -121,4 +121,16 @@ class ResourceController extends Controller
     }
     return response(json_encode($response))->header('Content-Type','application/json');
   }
+
+  public function destroy($id){
+    $user = Auth::user();
+    $resource = Resource::where('id',$id)->where('user_id',$user->id)->first();
+    if($resource){
+      $resource->groups()->detach();
+      $resource->delete();
+      return $resource;
+    }else{
+      abort(403, 'Unauthorized action.');
+    }
+  }
 }

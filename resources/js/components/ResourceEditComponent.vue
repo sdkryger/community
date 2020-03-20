@@ -17,6 +17,8 @@
         </div>
         <div class="card-footer">
           <div class="btn btn-primary" @click="saveResourceInfo()">Save</div>
+          <div class="btn" @click="deleteResource()" :class="[deleteInProgress ? 'btn-danger' : 'btn-primary']"><span v-if="deleteInProgress">Confirm </span>Delete</div>
+          <div class="btn btn-primary" v-if="deleteInProgress" @click="function(){deleteInProgress = false;}">Cancel delete</div>
         </div>
       </div>
       <template v-if="resource.new">
@@ -45,10 +47,29 @@
     data(){
       return{
         groups:[],
-        title:''
+        title:'',
+        deleteInProgress:false
       }
     },
     methods:{
+      deleteResource(){
+        var self = this;
+        if(this.deleteInProgress){
+          $.ajax({
+            method: 'DELETE',
+            url:'/resources/'+self.resource.id,
+            data:{
+              _token:self.csrf
+            },
+            dataType:'json'
+          })
+            .done(function(){
+              window.open('/home','_self');
+          });
+        }else{
+          this.deleteInProgress = true;
+        }
+      },
       setGroupAccess(index){
         var resourceId = this.resource.id;
         var groupId = this.groups[index].id;
@@ -96,7 +117,7 @@
             console.log(JSON.stringify(data));
             if(data.id)
               window.open('/resources/'+data.id,'_self');
-          });
+        });
       }
     }
   }
