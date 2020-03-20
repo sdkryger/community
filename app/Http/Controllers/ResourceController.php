@@ -32,19 +32,19 @@ class ResourceController extends Controller
     $response = new \stdClass();
     $response->error = true;
     $response->message = 'must specify groupId, resourceId and action';
-    if(isset($request['groupId']) && isset($request['resourceId']) && isset($request['action']) ){
+    if(isset($request['groupId']) && isset($request['resourceId']) && isset($request['access']) ){
       $response->message = 'all required values are set';
       $groupId = $request['groupId'];
       $userId = Auth::user()->id;
       $resourceId = $request['resourceId'];
-      $action = $request['action'];
+      $access = $request['access'] == 'true';
       $resource = Resource::where('id',$resourceId)->where('user_id',$userId)->first();
       $groupUser = GroupUser::where('user_id',$userId)->where('group_id',$groupId)->first();
       if($resource && $groupUser){
         $response->message = "you own this resource and are a member of the group";
         $group = Group::where('id',$groupId)->first();
-        if($action == 'add')
-          $group->resources()->save($resource);
+        if($access)
+          $group->resources()->attach($resource);
         else
           $group->resources()->detach($resource->id);
         $response->error = false;

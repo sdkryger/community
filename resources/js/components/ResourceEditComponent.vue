@@ -11,12 +11,11 @@
         <input class="form-control" type="text" :value="resource.title">
       </div>
       <div class="row">
-        <label>Groups</label>
+        <label>Group Access</label>
       </div>
-      <div class="row mt-1" v-for="group in groups">
+      <div class="row mt-1" v-for="(group, index) in groups">
+        <input class="mr-2" type="checkbox" v-model="group.access" @change="setGroupAccess(index)">
         <span>{{group.name}}</span>
-        <div class="btn btn-primary btn-sm" v-if="group.access">Remove from group</div>
-        <div class="btn btn-primary btn-sm" v-else>Let group access this</div>
       </div>
     </div>
   </div>
@@ -26,19 +25,45 @@
   export default{
     props:['resource'],
     mounted(){
-      var self = this;
-      var self = this;
-      $.get(
-        '/resources/groups/'+this.resource.id,
-        function(data){
-          self.groups = data;
-        },
-        'json'
-      );
+      this.updateGroups();
     },
     data(){
       return{
         groups:[]
+      }
+    },
+    methods:{
+      setGroupAccess(index){
+        var resourceId = this.resource.id;
+        var groupId = this.groups[index].id;
+        var access = this.groups[index].access;
+        console.log("Group: "+groupId+" access to resource : "+resourceId+" should be set to "+access);
+        var self = this;
+        $.get(
+          '/resources/groupAssignment',
+          {
+            groupId:groupId,
+            resourceId:resourceId,
+            access:access
+          },
+          function(data){
+            if(data.error)
+              alert(data.message);
+            else
+              self.updateGroups();
+          },
+          'json'
+        )
+      },
+      updateGroups(){
+        var self = this;
+        $.get(
+          '/resources/groups/'+this.resource.id,
+          function(data){
+            self.groups = data;
+          },
+          'json'
+        );
       }
     }
   }

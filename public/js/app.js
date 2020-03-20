@@ -2130,20 +2130,37 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['resource'],
   mounted: function mounted() {
-    var self = this;
-    var self = this;
-    $.get('/resources/groups/' + this.resource.id, function (data) {
-      self.groups = data;
-    }, 'json');
+    this.updateGroups();
   },
   data: function data() {
     return {
       groups: []
     };
+  },
+  methods: {
+    setGroupAccess: function setGroupAccess(index) {
+      var resourceId = this.resource.id;
+      var groupId = this.groups[index].id;
+      var access = this.groups[index].access;
+      console.log("Group: " + groupId + " access to resource : " + resourceId + " should be set to " + access);
+      var self = this;
+      $.get('/resources/groupAssignment', {
+        groupId: groupId,
+        resourceId: resourceId,
+        access: access
+      }, function (data) {
+        if (data.error) alert(data.message);else self.updateGroups();
+      }, 'json');
+    },
+    updateGroups: function updateGroups() {
+      var self = this;
+      $.get('/resources/groups/' + this.resource.id, function (data) {
+        self.groups = data;
+      }, 'json');
+    }
   }
 });
 
@@ -37810,17 +37827,55 @@ var render = function() {
         _vm._v(" "),
         _vm._m(1),
         _vm._v(" "),
-        _vm._l(_vm.groups, function(group) {
+        _vm._l(_vm.groups, function(group, index) {
           return _c("div", { staticClass: "row mt-1" }, [
-            _c("span", [_vm._v(_vm._s(group.name))]),
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: group.access,
+                  expression: "group.access"
+                }
+              ],
+              staticClass: "mr-2",
+              attrs: { type: "checkbox" },
+              domProps: {
+                checked: Array.isArray(group.access)
+                  ? _vm._i(group.access, null) > -1
+                  : group.access
+              },
+              on: {
+                change: [
+                  function($event) {
+                    var $$a = group.access,
+                      $$el = $event.target,
+                      $$c = $$el.checked ? true : false
+                    if (Array.isArray($$a)) {
+                      var $$v = null,
+                        $$i = _vm._i($$a, $$v)
+                      if ($$el.checked) {
+                        $$i < 0 && _vm.$set(group, "access", $$a.concat([$$v]))
+                      } else {
+                        $$i > -1 &&
+                          _vm.$set(
+                            group,
+                            "access",
+                            $$a.slice(0, $$i).concat($$a.slice($$i + 1))
+                          )
+                      }
+                    } else {
+                      _vm.$set(group, "access", $$c)
+                    }
+                  },
+                  function($event) {
+                    return _vm.setGroupAccess(index)
+                  }
+                ]
+              }
+            }),
             _vm._v(" "),
-            group.access
-              ? _c("div", { staticClass: "btn btn-primary btn-sm" }, [
-                  _vm._v("Remove from group")
-                ])
-              : _c("div", { staticClass: "btn btn-primary btn-sm" }, [
-                  _vm._v("Let group access this")
-                ])
+            _c("span", [_vm._v(_vm._s(group.name))])
           ])
         })
       ],
@@ -37839,7 +37894,9 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "row" }, [_c("label", [_vm._v("Groups")])])
+    return _c("div", { staticClass: "row" }, [
+      _c("label", [_vm._v("Group Access")])
+    ])
   }
 ]
 render._withStripped = true
