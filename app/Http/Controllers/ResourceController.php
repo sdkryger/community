@@ -83,4 +83,8 @@ class ResourceController extends Controller
     
     //echo "should list groups for resource with id: ".$id;
   }
+
+  public function create(){
+    return view('resourceCreate');
+  }
 }
