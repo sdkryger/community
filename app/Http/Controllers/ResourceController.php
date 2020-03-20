@@ -8,6 +8,7 @@ use App\User;
 use App\Group;
 use App\Resource;
 use App\GroupUser;
+use App\ResourceSchedule;
 
 class ResourceController extends Controller
 {
@@ -34,7 +35,7 @@ class ResourceController extends Controller
     return Auth::user()->resources;
   }
 
-  public function show($id){
+  public function edit($id){
     if($id == -1){
       $resource = new Resource;
       $resource->new = true;
@@ -147,5 +148,42 @@ class ResourceController extends Controller
     }else{
       abort(403, 'Unauthorized action.');
     }
+  }
+
+  public function show($id){
+    $user = Auth::user();
+    $groups = $user->groups();
+    $access = false;
+    foreach($groups as $group){
+      $resources = $group->resources;
+      foreach($resources as $resource){
+        if($resource->id == $id)
+          $access = true;
+      }
+    }
+    $resource = Resource::where('id',$id)->first();
+    if($resource && $access){
+      return view('resourceView',['resource'=>$resource]);
+    }else{
+        abort(403, 'Unauthorized action.');
+    }
+  }
+
+  public function scheduleList($id){
+    $user = Auth::user();
+    $groups = $user->groups();
+    $access = false;
+    foreach($groups as $group){
+      $resources = $group->resources;
+      foreach($resources as $resource){
+        if($resource->id == $id)
+          $access = true;
+      }
+    }
+    if($access){
+      return ResourceSchedule::where('resource_id',$id)->get();
+    }
+    else
+      abort(403, 'Unauthorized action.');
   }
 }

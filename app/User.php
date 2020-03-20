@@ -52,4 +52,8 @@ class User extends Authenticatable
     public function resources(){
       return $this->hasMany('App\Resource');
     }
+
+    public function resourceSchedules(){
+      return $this->hasMany('App\ResourceSchedule');
+    }
 }
