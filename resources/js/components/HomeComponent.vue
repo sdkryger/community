@@ -2,26 +2,39 @@
   <div class="row">
     <div class="col">
       <div class="row">
-        <div class="col h3">
-          Groups
+        <div class="col card pr-0 pl-0">
+          <div class="card-header h4">
+            Groups
+          </div>
+          <div class="card-body">
+            <div class="list-group list-group-flush" v-for="group in groups">
+              <a :href="'/groups/'+group.id" class="list-group-item list-group-item-action" :class="{ disabled: !group.isAdmin}">
+                <span>{{group.name}} </span>
+                <span v-if="group.isAdmin" class="badge badge-pill badge-primary">Admin</span>
+                <span v-if="group.joinRequests > 0" class="badge badge-pill badge-primary">Join requests: {{group.joinRequests}}</span>
+                <span class="badge badge-pill badge-secondary">Members: {{group.numberOfMembers}}</span>
+              </a>
+            </div>
+          </div>
+          <div class="card-footer">
+            <a class="btn btn-primary" role="button" href="/groups/create">New</a>
+            <a class="btn btn-primary" role="button" href="/groups/join">Join</a>
+          </div>
         </div>
       </div>
-      <div class="row" v-for="group in groups">
-        <div class="col" @click="editGroup(group.isAdmin,group.id)" style="cursor:pointer;">
-          <span>{{group.name}} </span>
-          <span v-if="group.isAdmin" class="badge badge-pill badge-primary">Admin</span>
-          <span v-if="group.joinRequests > 0" class="badge badge-pill badge-primary">Join requests: {{group.joinRequests}}</span>
-          <span class="badge badge-pill badge-secondary">Members: {{group.numberOfMembers}}</span>
-        </div>
-      </div>
-      <div class="row mt-2">
-        <div class="col h3">
-          My resources
-        </div>
-      </div>
-      <div class="row" v-for="resource in myResources">
-        <div class="col" @click="editResource(resource.id)" style="cursor:pointer;">
-          {{resource.title}}
+      <div class="row mt-1">
+        <div class="col card pr-0 pl-0">
+          <div class="card-header h4">
+            My resources
+          </div>
+          <div class="card-body">
+            <div class="list-group list-group-flush">
+              <a :href="'/resources/'+resource.id" v-for="resource in myResources" 
+                class="list-group-item list-group-item-action">
+                {{resource.title}}
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -38,16 +51,6 @@
       }
     },
     methods:{
-      editGroup(isAdmin,id){
-        if(isAdmin){
-          var url = '/groups/'+id;
-          window.open(url,'_self');
-        }
-      },
-      editResource(id){
-        var url = '/resources/'+id;
-        window.open(url,'_self');
-      },
       updateGroupList(){
         var self = this;
         $.get(

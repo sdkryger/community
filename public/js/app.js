@@ -2058,6 +2058,19 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -2067,16 +2080,6 @@ __webpack_require__.r(__webpack_exports__);
     };
   },
   methods: {
-    editGroup: function editGroup(isAdmin, id) {
-      if (isAdmin) {
-        var url = '/groups/' + id;
-        window.open(url, '_self');
-      }
-    },
-    editResource: function editResource(id) {
-      var url = '/resources/' + id;
-      window.open(url, '_self');
-    },
     updateGroupList: function updateGroupList() {
       var self = this;
       $.get('/groups', function (data) {
@@ -37689,76 +37692,96 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "row" }, [
-    _c(
-      "div",
-      { staticClass: "col" },
-      [
-        _vm._m(0),
-        _vm._v(" "),
-        _vm._l(_vm.groups, function(group) {
-          return _c("div", { staticClass: "row" }, [
-            _c(
-              "div",
-              {
-                staticClass: "col",
-                staticStyle: { cursor: "pointer" },
-                on: {
-                  click: function($event) {
-                    return _vm.editGroup(group.isAdmin, group.id)
-                  }
-                }
-              },
-              [
-                _c("span", [_vm._v(_vm._s(group.name) + " ")]),
-                _vm._v(" "),
-                group.isAdmin
-                  ? _c(
-                      "span",
-                      { staticClass: "badge badge-pill badge-primary" },
-                      [_vm._v("Admin")]
-                    )
-                  : _vm._e(),
-                _vm._v(" "),
-                group.joinRequests > 0
-                  ? _c(
-                      "span",
-                      { staticClass: "badge badge-pill badge-primary" },
-                      [_vm._v("Join requests: " + _vm._s(group.joinRequests))]
-                    )
-                  : _vm._e(),
-                _vm._v(" "),
+    _c("div", { staticClass: "col" }, [
+      _c("div", { staticClass: "row" }, [
+        _c("div", { staticClass: "col card pr-0 pl-0" }, [
+          _c("div", { staticClass: "card-header h4" }, [
+            _vm._v("\n          Groups\n        ")
+          ]),
+          _vm._v(" "),
+          _c(
+            "div",
+            { staticClass: "card-body" },
+            _vm._l(_vm.groups, function(group) {
+              return _c("div", { staticClass: "list-group list-group-flush" }, [
                 _c(
-                  "span",
-                  { staticClass: "badge badge-pill badge-secondary" },
-                  [_vm._v("Members: " + _vm._s(group.numberOfMembers))]
+                  "a",
+                  {
+                    staticClass: "list-group-item list-group-item-action",
+                    class: { disabled: !group.isAdmin },
+                    attrs: { href: "/groups/" + group.id }
+                  },
+                  [
+                    _c("span", [_vm._v(_vm._s(group.name) + " ")]),
+                    _vm._v(" "),
+                    group.isAdmin
+                      ? _c(
+                          "span",
+                          { staticClass: "badge badge-pill badge-primary" },
+                          [_vm._v("Admin")]
+                        )
+                      : _vm._e(),
+                    _vm._v(" "),
+                    group.joinRequests > 0
+                      ? _c(
+                          "span",
+                          { staticClass: "badge badge-pill badge-primary" },
+                          [
+                            _vm._v(
+                              "Join requests: " + _vm._s(group.joinRequests)
+                            )
+                          ]
+                        )
+                      : _vm._e(),
+                    _vm._v(" "),
+                    _c(
+                      "span",
+                      { staticClass: "badge badge-pill badge-secondary" },
+                      [_vm._v("Members: " + _vm._s(group.numberOfMembers))]
+                    )
+                  ]
                 )
-              ]
-            )
-          ])
-        }),
-        _vm._v(" "),
-        _vm._m(1),
-        _vm._v(" "),
-        _vm._l(_vm.myResources, function(resource) {
-          return _c("div", { staticClass: "row" }, [
+              ])
+            }),
+            0
+          ),
+          _vm._v(" "),
+          _vm._m(0)
+        ])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "row mt-1" }, [
+        _c("div", { staticClass: "col card pr-0 pl-0" }, [
+          _c("div", { staticClass: "card-header h4" }, [
+            _vm._v("\n          My resources\n        ")
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "card-body" }, [
             _c(
               "div",
-              {
-                staticClass: "col",
-                staticStyle: { cursor: "pointer" },
-                on: {
-                  click: function($event) {
-                    return _vm.editResource(resource.id)
-                  }
-                }
-              },
-              [_vm._v("\n        " + _vm._s(resource.title) + "\n      ")]
+              { staticClass: "list-group list-group-flush" },
+              _vm._l(_vm.myResources, function(resource) {
+                return _c(
+                  "a",
+                  {
+                    staticClass: "list-group-item list-group-item-action",
+                    attrs: { href: "/resources/" + resource.id }
+                  },
+                  [
+                    _vm._v(
+                      "\n              " +
+                        _vm._s(resource.title) +
+                        "\n            "
+                    )
+                  ]
+                )
+              }),
+              0
             )
           ])
-        })
-      ],
-      2
-    )
+        ])
+      ])
+    ])
   ])
 }
 var staticRenderFns = [
@@ -37766,18 +37789,24 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "row" }, [
-      _c("div", { staticClass: "col h3" }, [_vm._v("\n        Groups\n      ")])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "row mt-2" }, [
-      _c("div", { staticClass: "col h3" }, [
-        _vm._v("\n        My resources\n      ")
-      ])
+    return _c("div", { staticClass: "card-footer" }, [
+      _c(
+        "a",
+        {
+          staticClass: "btn btn-primary",
+          attrs: { role: "button", href: "/groups/create" }
+        },
+        [_vm._v("New")]
+      ),
+      _vm._v(" "),
+      _c(
+        "a",
+        {
+          staticClass: "btn btn-primary",
+          attrs: { role: "button", href: "/groups/join" }
+        },
+        [_vm._v("Join")]
+      )
     ])
   }
 ]
