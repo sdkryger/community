@@ -2074,12 +2074,28 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
       message: 'home component',
       groups: [],
-      myResources: []
+      myResources: [],
+      allResources: []
     };
   },
   methods: {
@@ -2094,11 +2110,18 @@ __webpack_require__.r(__webpack_exports__);
       $.get('/myResources', function (data) {
         self.myResources = data;
       }, 'json');
+    },
+    updateAllResources: function updateAllResources() {
+      var self = this;
+      $.get('/resources', function (data) {
+        self.allResources = data;
+      }, 'json');
     }
   },
   mounted: function mounted() {
     this.updateGroupList();
     this.updateMyResources();
+    this.updateAllResources();
   }
 });
 
@@ -37836,6 +37859,38 @@ var render = function() {
           ]),
           _vm._v(" "),
           _vm._m(1)
+        ])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "row mt-1" }, [
+        _c("div", { staticClass: "col card pr-0 pl-0" }, [
+          _c("div", { staticClass: "card-header h4" }, [
+            _vm._v("\n          All resources available to me\n        ")
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "card-body" }, [
+            _c(
+              "div",
+              { staticClass: "list-group list-group-flush" },
+              _vm._l(_vm.allResources, function(resource) {
+                return _c(
+                  "a",
+                  {
+                    staticClass: "list-group-item list-group-item-action",
+                    attrs: { href: "/resources/view/" + resource.id }
+                  },
+                  [
+                    _vm._v(
+                      "\n              " +
+                        _vm._s(resource.title) +
+                        "\n            "
+                    )
+                  ]
+                )
+              }),
+              0
+            )
+          ])
         ])
       ])
     ])

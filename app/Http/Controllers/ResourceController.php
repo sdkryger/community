@@ -12,7 +12,22 @@ use App\GroupUser;
 class ResourceController extends Controller
 {
   public function listResources(){
-    echo 'resources';
+    //echo 'resources';
+    $user = Auth::user();
+    $groups = $user->groups();
+    $groupIds = array();
+    $resourceIds = array();
+    foreach($groups as $group){
+      array_push($groupIds,$group->id);
+      $resources = $group->resources;
+      foreach($resources as $resource){
+        if(array_search($resource->id,$resourceIds) != -1)
+          array_push($resourceIds,$resource->id);
+      }
+    }
+
+    $resources = Resource::whereIn('id',$resourceIds)->get();
+    return $resources;
   }
 
   public function myResources(){

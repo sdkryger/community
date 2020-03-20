@@ -40,6 +40,21 @@
           </div>
         </div>
       </div>
+      <div class="row mt-1">
+        <div class="col card pr-0 pl-0">
+          <div class="card-header h4">
+            All resources available to me
+          </div>
+          <div class="card-body">
+            <div class="list-group list-group-flush">
+              <a :href="'/resources/view/'+resource.id" v-for="resource in allResources" 
+                class="list-group-item list-group-item-action">
+                {{resource.title}}
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -50,7 +65,8 @@
       return{
         message:'home component',
         groups:[],
-        myResources:[]
+        myResources:[],
+        allResources:[]
       }
     },
     methods:{
@@ -73,11 +89,22 @@
           },
           'json'
         )
+      },
+      updateAllResources(){
+        var self = this;
+        $.get(
+          '/resources',
+          function(data){
+            self.allResources = data;
+          },
+          'json'
+        )
       }
     },
     mounted(){
       this.updateGroupList();
       this.updateMyResources();
+      this.updateAllResources();
     }
   }
 </script>

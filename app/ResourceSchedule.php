@@ -5,7 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Resource extends Model
+class ResourceSchedule extends Model
 {
   use SoftDeletes;
 
@@ -13,11 +13,8 @@ class Resource extends Model
     return $this->belongsTo('App\User');
   }
 
-  public function groups(){
-    return $this->belongsToMany('App\Group');
+  public function resource(){
+    return $this->belongsTo('App\Resource');
   }
 
-  public function resourceSchedules(){
-    return $this->hasMany('App\ResourceSchedule');
-  }
 }
