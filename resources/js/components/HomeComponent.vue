@@ -31,7 +31,8 @@
             <div class="list-group list-group-flush">
               <a :href="'/resources/'+resource.id" v-for="resource in myResources" 
                 class="list-group-item list-group-item-action">
-                {{resource.title}}
+                <span>{{resource.title}}</span>
+                <span v-if="resource.scheduleRequests > 0" class="badge badge-pill badge-primary">Schedule requests:{{resource.scheduleRequests}}</span>
               </a>
             </div>
           </div>

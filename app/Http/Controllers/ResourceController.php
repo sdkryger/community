@@ -32,7 +32,21 @@ class ResourceController extends Controller
   }
 
   public function myResources(){
-    return Auth::user()->resources;
+    $resources = Auth::user()->resources;
+    foreach($resources as $resource){
+      //$resource->requests = $resource->resourceSchedules;
+      $resource->resourceSchedules;
+      $i = 0;
+      $schedules = array();
+      foreach($resource->resourceSchedules as $sched){
+        if(is_null($sched['approved']))
+          array_push($schedules, $sched);
+        $i++;
+      }
+      unset($resource->resourceSchedules);
+      $resource->scheduleRequests = count($schedules);
+    }
+    return $resources;
   }
 
   public function edit($id){

@@ -2267,6 +2267,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -38376,11 +38377,20 @@ var render = function() {
                     attrs: { href: "/resources/" + resource.id }
                   },
                   [
-                    _vm._v(
-                      "\n              " +
-                        _vm._s(resource.title) +
-                        "\n            "
-                    )
+                    _c("span", [_vm._v(_vm._s(resource.title))]),
+                    _vm._v(" "),
+                    resource.scheduleRequests > 0
+                      ? _c(
+                          "span",
+                          { staticClass: "badge badge-pill badge-primary" },
+                          [
+                            _vm._v(
+                              "Schedule requests:" +
+                                _vm._s(resource.scheduleRequests)
+                            )
+                          ]
+                        )
+                      : _vm._e()
                   ]
                 )
               }),
