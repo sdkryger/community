@@ -15,6 +15,29 @@
           </ul>
         </div>
       </div>
+      <div class="row border border-secondary">
+        <div class="col h3 mt-3">
+          <span>Schedule request</span><div v-if="requestedStart != '' && requestedEnd != ''" class="btn btn-primary ml-2">Send request</div>
+        </div>
+        <div class="w-100"></div>
+        <div class="col">
+          <span>Starting: </span>
+          <span v-if="requestedStart ==''" class="text-warning badge badge-dark">Not selected</span>
+          <span v-else class="badge badge-success text-white">{{requestedStart}}</span>
+        </div>
+        <div class="col">
+          <span>Ending: </span>
+          <span v-if="requestedEnd ==''" class="text-warning badge badge-dark">Not selected</span>
+          <span v-else class="badge badge-success text-white">{{requestedEnd}}</span>
+        </div>
+        <div class="w-100"></div>
+        <div class="col">
+          <calendar-component @selected="dateSelected" name="start"></calendar-component>
+        </div>
+        <div class="col">
+          <calendar-component @selected="dateSelected" name="end"></calendar-component>
+        </div>
+      </div>
     </div>
     
   </div>
@@ -25,7 +48,9 @@
     data(){
       return{
         message:'view data',
-        scheduleItems:[]
+        scheduleItems:[],
+        requestedStart:'',
+        requestedEnd:''
       }
     },
     props:['csrf','resource'],
@@ -33,6 +58,13 @@
       this.updateSchedule();
     },
     methods:{
+      dateSelected(data){
+        console.log(JSON.stringify(data));
+        if(data.name == 'start')
+          this.requestedStart = data.date;
+        else
+          this.requestedEnd = data.date;
+      },
       updateSchedule(){
         var self = this;
         $.get(
