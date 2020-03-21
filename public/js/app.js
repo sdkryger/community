@@ -2479,13 +2479,18 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
       message: 'view data',
       scheduleItems: [],
       requestedStart: '',
-      requestedEnd: ''
+      requestedEnd: '',
+      requestSuccess: false
     };
   },
   props: ['csrf', 'resource'],
@@ -2501,6 +2506,22 @@ __webpack_require__.r(__webpack_exports__);
       var self = this;
       $.get('/resources/scheduleList/' + this.resource.id, function (data) {
         self.scheduleItems = data;
+      }, 'json');
+    },
+    sendRequest: function sendRequest() {
+      var self = this;
+      $.get('/resources/scheduleRequest', {
+        _token: self.csrf,
+        resourceId: self.resource.id,
+        start: self.requestedStart,
+        end: self.requestedEnd
+      }, function (data) {
+        console.log(data);
+
+        if (data.id) {
+          self.requestSuccess = true;
+          self.updateSchedule();
+        }
       }, 'json');
     }
   }
@@ -38686,68 +38707,103 @@ var render = function() {
         ])
       ]),
       _vm._v(" "),
-      _c("div", { staticClass: "row border border-secondary" }, [
-        _c("div", { staticClass: "col h3 mt-3" }, [
-          _c("span", [_vm._v("Schedule request")]),
-          _vm.requestedStart != "" && _vm.requestedEnd != ""
-            ? _c("div", { staticClass: "btn btn-primary ml-2" }, [
-                _vm._v("Send request")
-              ])
+      _c(
+        "div",
+        { staticClass: "row border border-secondary" },
+        [
+          _c("div", { staticClass: "col h3 mt-3" }, [
+            _c("span", [_vm._v("Schedule request")]),
+            _vm._v(" "),
+            _vm.requestedStart != "" &&
+            _vm.requestedEnd != "" &&
+            !_vm.requestSuccess
+              ? _c(
+                  "div",
+                  {
+                    staticClass: "btn btn-primary ml-2",
+                    on: {
+                      click: function($event) {
+                        return _vm.sendRequest()
+                      }
+                    }
+                  },
+                  [_vm._v("Send request")]
+                )
+              : _vm._e(),
+            _vm._v(" "),
+            _vm.requestSuccess
+              ? _c("div", { staticClass: "alert alert-success" }, [
+                  _vm._v("Request submitted")
+                ])
+              : _vm._e()
+          ]),
+          _vm._v(" "),
+          !_vm.requestSuccess
+            ? [
+                _c("div", { staticClass: "w-100" }),
+                _vm._v(" "),
+                _c("div", { staticClass: "col" }, [
+                  _c("span", [_vm._v("Starting: ")]),
+                  _vm._v(" "),
+                  _vm.requestedStart == ""
+                    ? _c(
+                        "span",
+                        { staticClass: "text-warning badge badge-dark" },
+                        [_vm._v("Not selected")]
+                      )
+                    : _c(
+                        "span",
+                        { staticClass: "badge badge-success text-white" },
+                        [_vm._v(_vm._s(_vm.requestedStart))]
+                      )
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "col" }, [
+                  _c("span", [_vm._v("Ending: ")]),
+                  _vm._v(" "),
+                  _vm.requestedEnd == ""
+                    ? _c(
+                        "span",
+                        { staticClass: "text-warning badge badge-dark" },
+                        [_vm._v("Not selected")]
+                      )
+                    : _c(
+                        "span",
+                        { staticClass: "badge badge-success text-white" },
+                        [_vm._v(_vm._s(_vm.requestedEnd))]
+                      )
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "w-100" }),
+                _vm._v(" "),
+                _c(
+                  "div",
+                  { staticClass: "col" },
+                  [
+                    _c("calendar-component", {
+                      attrs: { name: "start" },
+                      on: { selected: _vm.dateSelected }
+                    })
+                  ],
+                  1
+                ),
+                _vm._v(" "),
+                _c(
+                  "div",
+                  { staticClass: "col" },
+                  [
+                    _c("calendar-component", {
+                      attrs: { name: "end" },
+                      on: { selected: _vm.dateSelected }
+                    })
+                  ],
+                  1
+                )
+              ]
             : _vm._e()
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "w-100" }),
-        _vm._v(" "),
-        _c("div", { staticClass: "col" }, [
-          _c("span", [_vm._v("Starting: ")]),
-          _vm._v(" "),
-          _vm.requestedStart == ""
-            ? _c("span", { staticClass: "text-warning badge badge-dark" }, [
-                _vm._v("Not selected")
-              ])
-            : _c("span", { staticClass: "badge badge-success text-white" }, [
-                _vm._v(_vm._s(_vm.requestedStart))
-              ])
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "col" }, [
-          _c("span", [_vm._v("Ending: ")]),
-          _vm._v(" "),
-          _vm.requestedEnd == ""
-            ? _c("span", { staticClass: "text-warning badge badge-dark" }, [
-                _vm._v("Not selected")
-              ])
-            : _c("span", { staticClass: "badge badge-success text-white" }, [
-                _vm._v(_vm._s(_vm.requestedEnd))
-              ])
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "w-100" }),
-        _vm._v(" "),
-        _c(
-          "div",
-          { staticClass: "col" },
-          [
-            _c("calendar-component", {
-              attrs: { name: "start" },
-              on: { selected: _vm.dateSelected }
-            })
-          ],
-          1
-        ),
-        _vm._v(" "),
-        _c(
-          "div",
-          { staticClass: "col" },
-          [
-            _c("calendar-component", {
-              attrs: { name: "end" },
-              on: { selected: _vm.dateSelected }
-            })
-          ],
-          1
-        )
-      ])
+        ],
+        2
+      )
     ])
   ])
 }

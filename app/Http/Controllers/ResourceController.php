@@ -186,4 +186,45 @@ class ResourceController extends Controller
     else
       abort(403, 'Unauthorized action.');
   }
+
+  public function scheduleRequest(Request $request){
+    $access = false;
+    $user = Auth::user();
+    $groups = $user->groups();
+    $resourceToBeScheduled = null;
+    if(isset($request['resourceId']) and isset($request['start']) and isset($request['end']) ){
+      $id = $request['resourceId'];
+      $start = $request['start'];
+      $end = $request['end'];
+      foreach($groups as $group){
+        $resources = $group->resources;
+        foreach($resources as $resource){
+          if($resource->id == $id){
+            $access = true;
+            $resourceToBeScheduled = $resource;
+          }
+            
+        }
+      }
+    }
+    
+    
+    
+    if($access){
+      $resource = Resource::where('id',$id)->first();
+      //return ResourceSchedule::where('resource_id',$id)->get();
+      //echo "should process request";
+      $resourceSchedule = new ResourceSchedule;
+      $resourceSchedule->start_time = $start;
+      $resourceSchedule->end_time = $end;
+      //$user->resourceSchedules()->save($resourceSchedule);
+      $resourceSchedule->user()->associate($user);
+      $resourceSchedule->resource()->associate($resource);
+      //$resourceToBeScheduled->resourceSchedules()->save($resourceSchedule);
+      $resourceSchedule->save();
+      return $resourceSchedule;
+    }
+    else
+      abort(403, 'Unauthorized action.');
+  }
 }
