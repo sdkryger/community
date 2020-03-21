@@ -15,6 +15,15 @@
           </ul>
         </div>
       </div>
+      <div class="row border border-secondary mt-1 mb-1">
+        <div class="col h3 mt-3">
+          <span>Schedule</span>
+        </div>
+        <div class="w-100"></div>
+        <div class="col">
+          <calendar-component class="mb-2" name="schedule" :items="scheduleItems"></calendar-component>
+        </div>
+      </div>
       <div class="row border border-secondary">
         <div class="col h3 mt-3">
           <span>Schedule request</span>
@@ -35,10 +44,10 @@
           </div>
           <div class="w-100"></div>
           <div class="col">
-            <calendar-component @selected="dateSelected" name="start"></calendar-component>
+            <calendar-component @selected="dateSelected" name="start" class="mb-2"></calendar-component>
           </div>
           <div class="col">
-            <calendar-component @selected="dateSelected" name="end"></calendar-component>
+            <calendar-component @selected="dateSelected" name="end" class="mb-2"></calendar-component>
           </div>
         </template>
       </div>
@@ -75,6 +84,12 @@
         $.get(
           '/resources/scheduleList/'+this.resource.id,
           function(data){
+            console.log("got schedule items");
+            for(var i=0;i<data.length;i++){
+              for(var j=0;j<data[i].resource_day_items.length;j++){
+                data[i].resource_day_items[j].timestamp = data[i].resource_day_items[j].timestamp.substr(0,10);
+              }
+            }
             self.scheduleItems = data;
           },
           'json'

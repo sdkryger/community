@@ -17,4 +17,9 @@ class ResourceSchedule extends Model
     return $this->belongsTo('App\Resource');
   }
 
+  public function resourceDayItems()
+  {
+    return $this->hasMany('App\ResourceDayItem');
+  }
+
 }

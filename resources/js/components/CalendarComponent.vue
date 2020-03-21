@@ -17,7 +17,7 @@
         <template v-for="week in daysDisplayed">
           <div class="w-100"></div>
           <template v-for="day in week">
-            <div class="col text-center" :class="[day.currentMonth ? 'font-weight-bold' :'font-weight-light']"
+            <div class="col text-center" :class="dayClass(day)"
               style="cursor:pointer;" @click="daySelected(day.date)">
               <span :class="[day.date == selectedDay ? 'text-primary border border-primary' : 'text-secondary']">{{day.display}}</span>
             </div>
@@ -73,7 +73,7 @@
 
 <script>
   export default{
-    props:['date','name'],
+    props:['date','name','items'],
     data(){
       return{
         monthNumber:1,
@@ -115,6 +115,8 @@
             var temp = {};
             temp.display = t.getDate();
             temp.date = new Date(t.getTime() - 86400000);
+            var temp2 = new Date(t.getTime() - 1 * 86400000);
+            temp.dateString = temp2.toISOString().substr(0,10);
             temp.currentMonth = t.getMonth() == this.monthNumber - 1;
             d.push(temp);
           }
@@ -154,10 +156,29 @@
       },
       sendDate(){
         this.$emit('selected',{name:this.name,date:this.selectedDateTime});
+      },
+      dayClass(day){
+        var temp = '';
+        if(day.currentMonth)
+          temp += 'font-weight-bold ';
+        else
+          temp += 'font-weight-light ';
+        if(this.items){
+          for(var i=0;i<this.items.length;i++){
+            for(var j=0;j<this.items[i].resource_day_items.length;j++){
+              if(this.items[i].resource_day_items[j].timestamp == day.dateString)
+                temp += 'bg-warning';
+            }
+          }
+        }
+        return temp;
       }
     },
     mounted(){
       console.log("calendar mounted");
+      var temp = new Date();
+      this.year = temp.getFullYear();
+      this.monthNumber = temp.getMonth()+1;
     }
   }
 </script>

@@ -1982,7 +1982,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 /* harmony default export */ __webpack_exports__["default"] = ({
-  props: ['date', 'name'],
+  props: ['date', 'name', 'items'],
   data: function data() {
     return {
       monthNumber: 1,
@@ -2026,6 +2026,8 @@ __webpack_require__.r(__webpack_exports__);
           var temp = {};
           temp.display = t.getDate();
           temp.date = new Date(t.getTime() - 86400000);
+          var temp2 = new Date(t.getTime() - 1 * 86400000);
+          temp.dateString = temp2.toISOString().substr(0, 10);
           temp.currentMonth = t.getMonth() == this.monthNumber - 1;
           d.push(temp);
         }
@@ -2068,10 +2070,27 @@ __webpack_require__.r(__webpack_exports__);
         name: this.name,
         date: this.selectedDateTime
       });
+    },
+    dayClass: function dayClass(day) {
+      var temp = '';
+      if (day.currentMonth) temp += 'font-weight-bold ';else temp += 'font-weight-light ';
+
+      if (this.items) {
+        for (var i = 0; i < this.items.length; i++) {
+          for (var j = 0; j < this.items[i].resource_day_items.length; j++) {
+            if (this.items[i].resource_day_items[j].timestamp == day.dateString) temp += 'bg-warning';
+          }
+        }
+      }
+
+      return temp;
     }
   },
   mounted: function mounted() {
     console.log("calendar mounted");
+    var temp = new Date();
+    this.year = temp.getFullYear();
+    this.monthNumber = temp.getMonth() + 1;
   }
 });
 
@@ -2484,6 +2503,15 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -2506,6 +2534,14 @@ __webpack_require__.r(__webpack_exports__);
     updateSchedule: function updateSchedule() {
       var self = this;
       $.get('/resources/scheduleList/' + this.resource.id, function (data) {
+        console.log("got schedule items");
+
+        for (var i = 0; i < data.length; i++) {
+          for (var j = 0; j < data[i].resource_day_items.length; j++) {
+            data[i].resource_day_items[j].timestamp = data[i].resource_day_items[j].timestamp.substr(0, 10);
+          }
+        }
+
         self.scheduleItems = data;
       }, 'json');
     },
@@ -37960,11 +37996,7 @@ var render = function() {
                     "div",
                     {
                       staticClass: "col text-center",
-                      class: [
-                        day.currentMonth
-                          ? "font-weight-bold"
-                          : "font-weight-light"
-                      ],
+                      class: _vm.dayClass(day),
                       staticStyle: { cursor: "pointer" },
                       on: {
                         click: function($event) {
@@ -38717,6 +38749,24 @@ var render = function() {
         ])
       ]),
       _vm._v(" "),
+      _c("div", { staticClass: "row border border-secondary mt-1 mb-1" }, [
+        _vm._m(0),
+        _vm._v(" "),
+        _c("div", { staticClass: "w-100" }),
+        _vm._v(" "),
+        _c(
+          "div",
+          { staticClass: "col" },
+          [
+            _c("calendar-component", {
+              staticClass: "mb-2",
+              attrs: { name: "schedule", items: _vm.scheduleItems }
+            })
+          ],
+          1
+        )
+      ]),
+      _vm._v(" "),
       _c(
         "div",
         { staticClass: "row border border-secondary" },
@@ -38791,6 +38841,7 @@ var render = function() {
                   { staticClass: "col" },
                   [
                     _c("calendar-component", {
+                      staticClass: "mb-2",
                       attrs: { name: "start" },
                       on: { selected: _vm.dateSelected }
                     })
@@ -38803,6 +38854,7 @@ var render = function() {
                   { staticClass: "col" },
                   [
                     _c("calendar-component", {
+                      staticClass: "mb-2",
                       attrs: { name: "end" },
                       on: { selected: _vm.dateSelected }
                     })
@@ -38817,7 +38869,16 @@ var render = function() {
     ])
   ])
 }
-var staticRenderFns = []
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col h3 mt-3" }, [
+      _c("span", [_vm._v("Schedule")])
+    ])
+  }
+]
 render._withStripped = true
 
 

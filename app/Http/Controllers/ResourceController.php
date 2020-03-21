@@ -9,6 +9,8 @@ use App\Group;
 use App\Resource;
 use App\GroupUser;
 use App\ResourceSchedule;
+use App\ResourceDayItem;
+use Carbon\Carbon;
 
 class ResourceController extends Controller
 {
@@ -183,7 +185,7 @@ class ResourceController extends Controller
     }
   }
 
-  public function scheduleList($id){
+  public function scheduleList($id, Request $request){
     $user = Auth::user();
     $groups = $user->groups();
     $access = false;
@@ -195,7 +197,16 @@ class ResourceController extends Controller
       }
     }
     if($access){
-      return ResourceSchedule::where('resource_id',$id)->get();
+      $scheduleItems = ResourceSchedule::where('resource_id',$id)->get();
+            
+      foreach($scheduleItems as $item){
+        $item->start = Carbon::createFromTimeString($item->start_time);
+        $item->end = Carbon::createFromTimeString($item->end_time);
+        $item->numberOfDays = $item->end->diffInDays($item->start) + 1;
+        $item->resourceDayItems;
+      }
+
+      return $scheduleItems;
     }
     else
       abort(403, 'Unauthorized action.');
@@ -236,6 +247,17 @@ class ResourceController extends Controller
       $resourceSchedule->resource()->associate($resource);
       //$resourceToBeScheduled->resourceSchedules()->save($resourceSchedule);
       $resourceSchedule->save();
+      $start .= ' 00:00:00.000';
+      $end .= ' 00:00:00.000';
+      $start = Carbon::createFromTimeString($start);
+      $end = Carbon::createFromTimeString($end);
+      $numberOfDays = $end->diffInDays($start) + 1;
+      for($i = 0;$i<$numberOfDays;$i++){
+        $resourceDayItem = new ResourceDayItem;
+        $resourceDayItem->timestamp = $start;
+        $resourceSchedule->resourceDayItems()->save($resourceDayItem);
+        $start->addDays(1);
+      }
       return $resourceSchedule;
     }
     else
