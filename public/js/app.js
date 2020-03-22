@@ -1982,7 +1982,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 /* harmony default export */ __webpack_exports__["default"] = ({
-  props: ['date', 'name', 'items'],
+  props: ['date', 'name', 'items', 'requestStatus'],
   data: function data() {
     return {
       monthNumber: 1,
@@ -2067,7 +2067,6 @@ __webpack_require__.r(__webpack_exports__);
     },
     sendDate: function sendDate() {
       this.$emit('selected', {
-        name: this.name,
         date: this.selectedDateTime
       });
     },
@@ -2078,7 +2077,7 @@ __webpack_require__.r(__webpack_exports__);
       if (this.items) {
         for (var i = 0; i < this.items.length; i++) {
           for (var j = 0; j < this.items[i].resource_day_items.length; j++) {
-            if (this.items[i].resource_day_items[j].timestamp == day.dateString) temp += 'bg-warning';
+            if (this.items[i].resource_day_items[j].timestamp == day.dateString) temp += 'bg-dark text-light';
           }
         }
       }
@@ -2488,30 +2487,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -2519,7 +2494,7 @@ __webpack_require__.r(__webpack_exports__);
       scheduleItems: [],
       requestedStart: '',
       requestedEnd: '',
-      requestSuccess: false
+      requestStatus: 'notStarted'
     };
   },
   props: ['csrf', 'resource'],
@@ -2529,7 +2504,18 @@ __webpack_require__.r(__webpack_exports__);
   methods: {
     dateSelected: function dateSelected(data) {
       console.log(JSON.stringify(data));
-      if (data.name == 'start') this.requestedStart = data.date;else this.requestedEnd = data.date;
+
+      switch (this.requestStatus) {
+        case 'selectStart':
+          this.requestedStart = data.date;
+          this.requestStatus = 'selectEnd';
+          break;
+
+        case 'selectEnd':
+          this.requestedEnd = data.date;
+          this.requestStatus = 'awaitingSubmit';
+          break;
+      }
     },
     updateSchedule: function updateSchedule() {
       var self = this;
@@ -2545,6 +2531,9 @@ __webpack_require__.r(__webpack_exports__);
         self.scheduleItems = data;
       }, 'json');
     },
+    startRequest: function startRequest() {
+      this.requestStatus = 'selectStart';
+    },
     sendRequest: function sendRequest() {
       var self = this;
       $.get('/resources/scheduleRequest', {
@@ -2556,7 +2545,7 @@ __webpack_require__.r(__webpack_exports__);
         console.log(data);
 
         if (data.id) {
-          self.requestSuccess = true;
+          self.requestStatus = 'requestSuccess';
           self.updateSchedule();
         }
       }, 'json');
@@ -38728,29 +38717,79 @@ var render = function() {
         ])
       ]),
       _vm._v(" "),
-      _c("div", { staticClass: "row" }, [
-        _c("div", { staticClass: "col" }, [
-          _c(
-            "ul",
-            { staticClass: "list-group" },
-            _vm._l(_vm.scheduleItems, function(item) {
-              return _c("li", { staticClass: "list-group-item" }, [
-                _vm._v(
-                  "\n            Start: " +
-                    _vm._s(item.start_time) +
-                    ", End: " +
-                    _vm._s(item.end_time) +
-                    "\n          "
-                )
-              ])
-            }),
-            0
-          )
-        ])
-      ]),
-      _vm._v(" "),
       _c("div", { staticClass: "row border border-secondary mt-1 mb-1" }, [
-        _vm._m(0),
+        _c("div", { staticClass: "col h3 mt-3" }, [
+          _c("span", [_vm._v("Schedule")]),
+          _vm._v(" "),
+          _vm.requestStatus == "notStarted"
+            ? _c(
+                "div",
+                {
+                  staticClass: "btn btn-primary",
+                  on: {
+                    click: function($event) {
+                      return _vm.startRequest()
+                    }
+                  }
+                },
+                [_vm._v("Request")]
+              )
+            : _vm._e(),
+          _vm._v(" "),
+          _vm.requestStatus == "selectStart"
+            ? _c(
+                "div",
+                {
+                  staticClass: "alert alert-info",
+                  staticStyle: { display: "inline" }
+                },
+                [_vm._v("\n          1. Select start date\n        ")]
+              )
+            : _vm._e(),
+          _vm._v(" "),
+          _vm.requestStatus == "selectEnd"
+            ? _c(
+                "div",
+                {
+                  staticClass: "alert alert-info",
+                  staticStyle: { display: "inline" }
+                },
+                [
+                  _vm._v(
+                    "\n          2. Select end date (starting :" +
+                      _vm._s(_vm.requestedStart) +
+                      ")\n        "
+                  )
+                ]
+              )
+            : _vm._e(),
+          _vm._v(" "),
+          _vm.requestStatus == "awaitingSubmit"
+            ? _c(
+                "div",
+                {
+                  staticClass: "btn btn-primary ml-2",
+                  on: {
+                    click: function($event) {
+                      return _vm.sendRequest()
+                    }
+                  }
+                },
+                [_vm._v("Send request")]
+              )
+            : _vm._e(),
+          _vm._v(" "),
+          _vm.requestStatus == "requestSuccess"
+            ? _c(
+                "div",
+                {
+                  staticClass: "alert alert-success",
+                  staticStyle: { display: "inline" }
+                },
+                [_vm._v("\n          Request submitted\n        ")]
+              )
+            : _vm._e()
+        ]),
         _vm._v(" "),
         _c("div", { staticClass: "w-100" }),
         _vm._v(" "),
@@ -38760,125 +38799,21 @@ var render = function() {
           [
             _c("calendar-component", {
               staticClass: "mb-2",
-              attrs: { name: "schedule", items: _vm.scheduleItems }
+              attrs: {
+                name: "schedule",
+                items: _vm.scheduleItems,
+                requestStatus: _vm.requestStatus
+              },
+              on: { selected: _vm.dateSelected }
             })
           ],
           1
         )
-      ]),
-      _vm._v(" "),
-      _c(
-        "div",
-        { staticClass: "row border border-secondary" },
-        [
-          _c("div", { staticClass: "col h3 mt-3" }, [
-            _c("span", [_vm._v("Schedule request")]),
-            _vm._v(" "),
-            _vm.requestedStart != "" &&
-            _vm.requestedEnd != "" &&
-            !_vm.requestSuccess
-              ? _c(
-                  "div",
-                  {
-                    staticClass: "btn btn-primary ml-2",
-                    on: {
-                      click: function($event) {
-                        return _vm.sendRequest()
-                      }
-                    }
-                  },
-                  [_vm._v("Send request")]
-                )
-              : _vm._e(),
-            _vm._v(" "),
-            _vm.requestSuccess
-              ? _c("div", { staticClass: "alert alert-success" }, [
-                  _vm._v("Request submitted")
-                ])
-              : _vm._e()
-          ]),
-          _vm._v(" "),
-          !_vm.requestSuccess
-            ? [
-                _c("div", { staticClass: "w-100" }),
-                _vm._v(" "),
-                _c("div", { staticClass: "col" }, [
-                  _c("span", [_vm._v("Starting: ")]),
-                  _vm._v(" "),
-                  _vm.requestedStart == ""
-                    ? _c(
-                        "span",
-                        { staticClass: "text-warning badge badge-dark" },
-                        [_vm._v("Not selected")]
-                      )
-                    : _c(
-                        "span",
-                        { staticClass: "badge badge-success text-white" },
-                        [_vm._v(_vm._s(_vm.requestedStart))]
-                      )
-                ]),
-                _vm._v(" "),
-                _c("div", { staticClass: "col" }, [
-                  _c("span", [_vm._v("Ending: ")]),
-                  _vm._v(" "),
-                  _vm.requestedEnd == ""
-                    ? _c(
-                        "span",
-                        { staticClass: "text-warning badge badge-dark" },
-                        [_vm._v("Not selected")]
-                      )
-                    : _c(
-                        "span",
-                        { staticClass: "badge badge-success text-white" },
-                        [_vm._v(_vm._s(_vm.requestedEnd))]
-                      )
-                ]),
-                _vm._v(" "),
-                _c("div", { staticClass: "w-100" }),
-                _vm._v(" "),
-                _c(
-                  "div",
-                  { staticClass: "col" },
-                  [
-                    _c("calendar-component", {
-                      staticClass: "mb-2",
-                      attrs: { name: "start" },
-                      on: { selected: _vm.dateSelected }
-                    })
-                  ],
-                  1
-                ),
-                _vm._v(" "),
-                _c(
-                  "div",
-                  { staticClass: "col" },
-                  [
-                    _c("calendar-component", {
-                      staticClass: "mb-2",
-                      attrs: { name: "end" },
-                      on: { selected: _vm.dateSelected }
-                    })
-                  ],
-                  1
-                )
-              ]
-            : _vm._e()
-        ],
-        2
-      )
+      ])
     ])
   ])
 }
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "col h3 mt-3" }, [
-      _c("span", [_vm._v("Schedule")])
-    ])
-  }
-]
+var staticRenderFns = []
 render._withStripped = true
 
 

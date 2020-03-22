@@ -73,7 +73,7 @@
 
 <script>
   export default{
-    props:['date','name','items'],
+    props:['date','name','items','requestStatus'],
     data(){
       return{
         monthNumber:1,
@@ -155,7 +155,7 @@
         this.sendDate();
       },
       sendDate(){
-        this.$emit('selected',{name:this.name,date:this.selectedDateTime});
+        this.$emit('selected',{date:this.selectedDateTime});
       },
       dayClass(day){
         var temp = '';
@@ -167,7 +167,7 @@
           for(var i=0;i<this.items.length;i++){
             for(var j=0;j<this.items[i].resource_day_items.length;j++){
               if(this.items[i].resource_day_items[j].timestamp == day.dateString)
-                temp += 'bg-warning';
+                temp += 'bg-dark text-light';
             }
           }
         }
