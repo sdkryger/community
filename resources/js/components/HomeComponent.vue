@@ -25,34 +25,20 @@
       <div class="row mt-1">
         <div class="col card pr-0 pl-0">
           <div class="card-header h4">
-            My resources
-          </div>
-          <div class="card-body">
-            <div class="list-group list-group-flush">
-              <a :href="'/resources/'+resource.id" v-for="resource in myResources" 
-                class="list-group-item list-group-item-action">
-                <span>{{resource.title}}</span>
-                <span v-if="resource.scheduleRequests > 0" class="badge badge-pill badge-primary">Schedule requests:{{resource.scheduleRequests}}</span>
-              </a>
-            </div>
-          </div>
-          <div class="card-footer">
-            <a class="btn btn-primary" role="button" href="/resources/-1">New</a>
-          </div>
-        </div>
-      </div>
-      <div class="row mt-1">
-        <div class="col card pr-0 pl-0">
-          <div class="card-header h4">
-            All resources available to me
+            Resources
           </div>
           <div class="card-body">
             <div class="list-group list-group-flush">
               <a :href="'/resources/view/'+resource.id" v-for="resource in allResources" 
                 class="list-group-item list-group-item-action">
-                {{resource.title}}
+                <span>{{resource.title}}</span>
+                <span v-if="resource.isOwner" class="badge badge-pill badge-primary">Mine</span>
+                <span v-if="resource.scheduleRequests>0" class="badge badge-pill badge-primary">Schedule requests: {{resource.scheduleRequests}}</span>
               </a>
             </div>
+          </div>
+          <div class="card-footer">
+            <a class="btn btn-primary" role="button" href="/resources/-1">New</a>
           </div>
         </div>
       </div>
@@ -66,7 +52,6 @@
       return{
         message:'home component',
         groups:[],
-        myResources:[],
         allResources:[]
       }
     },
@@ -77,16 +62,6 @@
           '/groups',
           function(data){
             self.groups = data;
-          },
-          'json'
-        )
-      },
-      updateMyResources(){
-        var self = this;
-        $.get(
-          '/myResources',
-          function(data){
-            self.myResources = data;
           },
           'json'
         )
@@ -104,7 +79,6 @@
     },
     mounted(){
       this.updateGroupList();
-      this.updateMyResources();
       this.updateAllResources();
     }
   }

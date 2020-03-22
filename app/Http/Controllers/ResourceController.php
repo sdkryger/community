@@ -30,6 +30,23 @@ class ResourceController extends Controller
     }
 
     $resources = Resource::whereIn('id',$resourceIds)->get();
+    foreach($resources as $resource){
+      //$resource->requests = $resource->resourceSchedules;
+      if($resource->user_id == $user->id){
+        $resource->isOwner = true;
+        $resource->resourceSchedules;
+        $i = 0;
+        $schedules = array();
+        foreach($resource->resourceSchedules as $sched){
+          if(is_null($sched['approved']))
+            array_push($schedules, $sched);
+          $i++;
+        }
+        unset($resource->resourceSchedules);
+        $resource->scheduleRequests = count($schedules);
+      }else
+        $resource->isOwner = false;
+    }
     return $resources;
   }
 
