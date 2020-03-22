@@ -38,6 +38,7 @@ Route::get('/resources/groupAssignment','ResourceController@groupAssignment');
 Route::get('/resources/groups/{id}','ResourceController@listGroups');
 Route::get('/resources/scheduleList/{id}','ResourceController@scheduleList');
 Route::get('/resources/scheduleRequest','ResourceController@scheduleRequest');
+Route::get('/resources/scheduleRequestProcess','ResourceController@scheduleRequestProcess');
 Route::get('/resources/view/{id}','ResourceController@show');
 Route::get('/resources/{id}','ResourceController@edit');
 Route::put('/resources/{id}','ResourceController@update');

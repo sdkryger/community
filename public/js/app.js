@@ -2064,6 +2064,29 @@ __webpack_require__.r(__webpack_exports__);
       this.dateSelected = true;
       this.selectedDay = date;
       this.sendDate();
+      this.checkForOwnerAction();
+    },
+    checkForOwnerAction: function checkForOwnerAction() {
+      if (this.isOwner) {
+        //console.log("should check for owner action on date: "+this.selectedDateTime);
+        var requestIndex = -1;
+        var date = this.selectedDateTime;
+
+        for (var i = 0; i < this.items.length; i++) {
+          //iterate through requests
+          //console.log("looking at request at index: "+i);
+          for (var j = 0; j < this.items[i].resource_day_items.length; j++) {
+            if (this.items[i].resource_day_items[j].timestamp == date) {
+              requestIndex = i;
+            }
+          }
+        } //console.log('requestIndex: '+requestIndex);
+
+
+        if (requestIndex != -1) this.$emit('request', {
+          index: requestIndex
+        });
+      }
     },
     sendDate: function sendDate() {
       this.$emit('selected', {
@@ -2491,6 +2514,39 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -2498,17 +2554,19 @@ __webpack_require__.r(__webpack_exports__);
       scheduleItems: [],
       requestedStart: '',
       requestedEnd: '',
-      requestStatus: 'notStarted'
+      requestStatus: 'notStarted',
+      title: '',
+      scheduleItemIndex: -1
     };
   },
   props: ['csrf', 'resource'],
   mounted: function mounted() {
+    this.title = this.resource.title;
     this.updateSchedule();
   },
   methods: {
     dateSelected: function dateSelected(data) {
-      console.log(JSON.stringify(data));
-
+      //console.log(JSON.stringify(data));
       switch (this.requestStatus) {
         case 'selectStart':
           this.requestedStart = data.date;
@@ -2519,6 +2577,16 @@ __webpack_require__.r(__webpack_exports__);
           this.requestedEnd = data.date;
           this.requestStatus = 'awaitingSubmit';
           break;
+      }
+    },
+    requestSelected: function requestSelected(data) {
+      console.log("Request selected: " + JSON.stringify(data));
+      console.log("Should process click on requestIndex: " + data.index);
+
+      if (!this.scheduleItems[data.index].approved) {
+        console.log("This request is not approved");
+        this.scheduleItemIndex = data.index;
+        $("#requestModal").modal('show');
       }
     },
     updateSchedule: function updateSchedule() {
@@ -2553,6 +2621,54 @@ __webpack_require__.r(__webpack_exports__);
           self.updateSchedule();
         }
       }, 'json');
+    },
+    approveRequest: function approveRequest() {
+      var self = this;
+      $.get('/resources/scheduleRequestProcess', {
+        _token: self.csrf,
+        resourceId: self.resource.id,
+        action: 'approve',
+        requestId: self.scheduleItems[self.scheduleItemIndex].id
+      }, function (data) {
+        console.log(data);
+        self.scheduleItemIndex = -1;
+        self.updateSchedule();
+        $("#requestModal").modal('hide');
+      }, 'json');
+    },
+    rejectRequest: function rejectRequest() {
+      var self = this;
+      $.get('/resources/scheduleRequestProcess', {
+        _token: self.csrf,
+        resourceId: self.resource.id,
+        action: 'reject',
+        requestId: self.scheduleItems[self.scheduleItemIndex].id
+      }, function (data) {
+        console.log(data);
+        self.scheduleItemIndex = -1;
+        self.updateSchedule();
+        $("#requestModal").modal('hide');
+      }, 'json');
+    },
+    reviewRequest: function reviewRequest() {
+      var index = -1;
+
+      for (var i = 0; i < this.scheduleItems.length; i++) {
+        if (!this.scheduleItems[i].approved && index == -1) index = i;
+      }
+
+      alert("should the request at index: " + index);
+    }
+  },
+  computed: {
+    requestResponseRequired: function requestResponseRequired() {
+      var count = 0;
+
+      for (var i = 0; i < this.scheduleItems.length; i++) {
+        if (!this.scheduleItems[i].approved) count++;
+      }
+
+      return count;
     }
   }
 });
@@ -38716,109 +38832,259 @@ var render = function() {
   return _c("div", { staticClass: "row" }, [
     _c("div", { staticClass: "col" }, [
       _c("div", { staticClass: "row" }, [
-        _c("div", { staticClass: "col h4" }, [
-          _vm._v("\n        " + _vm._s(_vm.resource.title) + "\n      ")
-        ])
+        this.resource.owner
+          ? _c("div", { staticClass: "form-group col" }, [
+              _c("label", [_vm._v("Title")]),
+              _vm._v(" "),
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.title,
+                    expression: "title"
+                  }
+                ],
+                staticClass: "form-control",
+                attrs: { type: "text" },
+                domProps: { value: _vm.title },
+                on: {
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.title = $event.target.value
+                  }
+                }
+              })
+            ])
+          : _c("div", { staticClass: "col h4" }, [
+              _vm._v("\n        " + _vm._s(_vm.resource.title) + "\n      ")
+            ])
       ]),
       _vm._v(" "),
-      _c("div", { staticClass: "row border border-secondary mt-1 mb-1" }, [
-        _c("div", { staticClass: "col h3 mt-3" }, [
-          _c("span", [_vm._v("Schedule")]),
-          _vm._v(" "),
-          _vm.requestStatus == "notStarted"
-            ? _c(
-                "div",
-                {
-                  staticClass: "btn btn-primary",
-                  on: {
-                    click: function($event) {
-                      return _vm.startRequest()
+      _c(
+        "div",
+        { staticClass: "row border border-secondary mt-1 mb-1" },
+        [
+          _c("div", { staticClass: "col h3 mt-3" }, [
+            _c("span", [_vm._v("Schedule")]),
+            _vm._v(" "),
+            _vm.requestStatus == "notStarted"
+              ? _c(
+                  "div",
+                  {
+                    staticClass: "btn btn-primary",
+                    on: {
+                      click: function($event) {
+                        return _vm.startRequest()
+                      }
                     }
-                  }
-                },
-                [_vm._v("Request")]
-              )
-            : _vm._e(),
+                  },
+                  [_vm._v("Create request")]
+                )
+              : _vm._e(),
+            _vm._v(" "),
+            _vm.requestStatus == "selectStart"
+              ? _c(
+                  "div",
+                  {
+                    staticClass: "alert alert-info",
+                    staticStyle: { display: "inline" }
+                  },
+                  [_vm._v("\n          1. Select start date\n        ")]
+                )
+              : _vm._e(),
+            _vm._v(" "),
+            _vm.requestStatus == "selectEnd"
+              ? _c(
+                  "div",
+                  {
+                    staticClass: "alert alert-info",
+                    staticStyle: { display: "inline" }
+                  },
+                  [
+                    _vm._v(
+                      "\n          2. Select end date (starting :" +
+                        _vm._s(_vm.requestedStart) +
+                        ")\n        "
+                    )
+                  ]
+                )
+              : _vm._e(),
+            _vm._v(" "),
+            _vm.requestStatus == "awaitingSubmit"
+              ? _c(
+                  "div",
+                  {
+                    staticClass: "btn btn-primary ml-2",
+                    on: {
+                      click: function($event) {
+                        return _vm.sendRequest()
+                      }
+                    }
+                  },
+                  [_vm._v("Send request")]
+                )
+              : _vm._e(),
+            _vm._v(" "),
+            _vm.requestStatus == "requestSuccess"
+              ? _c(
+                  "div",
+                  {
+                    staticClass: "alert alert-success",
+                    staticStyle: { display: "inline" }
+                  },
+                  [_vm._v("\n          Request submitted\n        ")]
+                )
+              : _vm._e()
+          ]),
           _vm._v(" "),
-          _vm.requestStatus == "selectStart"
-            ? _c(
-                "div",
-                {
-                  staticClass: "alert alert-info",
-                  staticStyle: { display: "inline" }
-                },
-                [_vm._v("\n          1. Select start date\n        ")]
-              )
-            : _vm._e(),
+          _c("div", { staticClass: "w-100" }),
           _vm._v(" "),
-          _vm.requestStatus == "selectEnd"
-            ? _c(
-                "div",
-                {
-                  staticClass: "alert alert-info",
-                  staticStyle: { display: "inline" }
-                },
-                [
-                  _vm._v(
-                    "\n          2. Select end date (starting :" +
-                      _vm._s(_vm.requestedStart) +
-                      ")\n        "
+          _vm.requestResponseRequired > 0
+            ? [
+                _c("div", { staticClass: "col alert alert-warning" }, [
+                  _c("span", [
+                    _vm._v(
+                      "Unapproved requests to review: " +
+                        _vm._s(_vm.requestResponseRequired)
+                    )
+                  ]),
+                  _vm._v(" "),
+                  _c(
+                    "div",
+                    {
+                      staticClass: "btn btn-primary",
+                      on: { click: _vm.reviewRequest }
+                    },
+                    [_vm._v("Review request")]
                   )
-                ]
-              )
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "w-100" })
+              ]
             : _vm._e(),
           _vm._v(" "),
-          _vm.requestStatus == "awaitingSubmit"
-            ? _c(
-                "div",
-                {
-                  staticClass: "btn btn-primary ml-2",
-                  on: {
-                    click: function($event) {
-                      return _vm.sendRequest()
-                    }
-                  }
+          _c(
+            "div",
+            { staticClass: "col" },
+            [
+              _c("calendar-component", {
+                staticClass: "mb-2",
+                attrs: {
+                  name: "schedule",
+                  items: _vm.scheduleItems,
+                  requestStatus: _vm.requestStatus,
+                  isOwner: this.resource.owner
                 },
-                [_vm._v("Send request")]
-              )
-            : _vm._e(),
-          _vm._v(" "),
-          _vm.requestStatus == "requestSuccess"
-            ? _c(
-                "div",
-                {
-                  staticClass: "alert alert-success",
-                  staticStyle: { display: "inline" }
-                },
-                [_vm._v("\n          Request submitted\n        ")]
-              )
-            : _vm._e()
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "w-100" }),
-        _vm._v(" "),
+                on: { selected: _vm.dateSelected, request: _vm.requestSelected }
+              })
+            ],
+            1
+          )
+        ],
+        2
+      )
+    ]),
+    _vm._v(" "),
+    _c(
+      "div",
+      {
+        staticClass: "modal fade",
+        attrs: {
+          id: "requestModal",
+          tabindex: "-1",
+          role: "dialog",
+          "aria-hidden": "true"
+        }
+      },
+      [
         _c(
           "div",
-          { staticClass: "col" },
+          { staticClass: "modal-dialog", attrs: { role: "document" } },
           [
-            _c("calendar-component", {
-              staticClass: "mb-2",
-              attrs: {
-                name: "schedule",
-                items: _vm.scheduleItems,
-                requestStatus: _vm.requestStatus,
-                isOwner: this.resource.owner
-              },
-              on: { selected: _vm.dateSelected }
-            })
-          ],
-          1
+            _c("div", { staticClass: "modal-content" }, [
+              _vm._m(0),
+              _vm._v(" "),
+              _c("div", { staticClass: "modal-body" }, [
+                _vm.scheduleItemIndex != -1
+                  ? _c("span", [
+                      _vm._v(
+                        "\n            Requested by: " +
+                          _vm._s(
+                            _vm.scheduleItems[_vm.scheduleItemIndex].user.name
+                          ) +
+                          "\n          "
+                      )
+                    ])
+                  : _vm._e()
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "modal-footer" }, [
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-secondary",
+                    attrs: { type: "button", "data-dismiss": "modal" }
+                  },
+                  [_vm._v("Close")]
+                ),
+                _vm._v(" "),
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-primary",
+                    attrs: { type: "button" },
+                    on: { click: _vm.rejectRequest }
+                  },
+                  [_vm._v("Reject")]
+                ),
+                _vm._v(" "),
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-primary",
+                    attrs: { type: "button" },
+                    on: { click: _vm.approveRequest }
+                  },
+                  [_vm._v("Approve")]
+                )
+              ])
+            ])
+          ]
         )
-      ])
-    ])
+      ]
+    )
   ])
 }
-var staticRenderFns = []
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "modal-header" }, [
+      _c(
+        "h5",
+        { staticClass: "modal-title", attrs: { id: "exampleModalLabel" } },
+        [_vm._v("Schedule request")]
+      ),
+      _vm._v(" "),
+      _c(
+        "button",
+        {
+          staticClass: "close",
+          attrs: {
+            type: "button",
+            "data-dismiss": "modal",
+            "aria-label": "Close"
+          }
+        },
+        [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
+      )
+    ])
+  }
+]
 render._withStripped = true
 
 

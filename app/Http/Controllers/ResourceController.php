@@ -205,6 +205,7 @@ class ResourceController extends Controller
         $item->end = Carbon::createFromTimeString($item->end_time);
         $item->numberOfDays = $item->end->diffInDays($item->start) + 1;
         $item->resourceDayItems;
+        $item->user;
       }
 
       return $scheduleItems;
@@ -262,6 +263,37 @@ class ResourceController extends Controller
       return $resourceSchedule;
     }
     else
+      abort(403, 'Unauthorized action.');
+  }
+
+  public function scheduleRequestProcess(Request $request){
+    $access = false;
+    $user = Auth::user();
+    $groups = $user->groups();
+    if(isset($request['resourceId']) and isset($request['action']) and isset($request['requestId']) ){
+      $id = $request['resourceId'];
+      $action = $request['action'];
+      $requestId = $request['requestId'];
+      foreach($groups as $group){
+        $resources = $group->resources;
+        foreach($resources as $resource){
+          if($resource->id == $id){
+            $access = true;
+          }
+            
+        }
+      }
+    }
+    if($access){
+      $resourceSchedule = ResourceSchedule::where('id',$requestId)->first();
+      if($action == 'approve'){
+        $resourceSchedule->approved = true;
+        $resourceSchedule->save();
+      }else{
+        $resourceSchedule->delete();
+      }
+      return $resourceSchedule;
+    }else
       abort(403, 'Unauthorized action.');
   }
 }

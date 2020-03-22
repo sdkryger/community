@@ -153,6 +153,26 @@
         this.dateSelected = true;
         this.selectedDay = date;
         this.sendDate();
+        this.checkForOwnerAction();
+      },
+      checkForOwnerAction(){
+        if(this.isOwner){
+          //console.log("should check for owner action on date: "+this.selectedDateTime);
+          var requestIndex = -1;
+          var date = this.selectedDateTime;
+          for(var i=0;i<this.items.length;i++){
+            //iterate through requests
+            //console.log("looking at request at index: "+i);
+            for(var j=0;j<this.items[i].resource_day_items.length;j++){
+              if(this.items[i].resource_day_items[j].timestamp == date){
+                requestIndex = i;
+              }
+            }
+          }
+          //console.log('requestIndex: '+requestIndex);
+          if(requestIndex != -1)
+            this.$emit('request',{index:requestIndex});
+        }
       },
       sendDate(){
         this.$emit('selected',{date:this.selectedDateTime});
