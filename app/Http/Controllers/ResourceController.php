@@ -179,6 +179,7 @@ class ResourceController extends Controller
     }
     $resource = Resource::where('id',$id)->first();
     if($resource && $access){
+      $resource->owner = $resource->user_id == $user->id;
       return view('resourceView',['resource'=>$resource]);
     }else{
         abort(403, 'Unauthorized action.');

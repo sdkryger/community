@@ -24,7 +24,7 @@
         <div class="w-100"></div>
         <div class="col">
           <calendar-component class="mb-2" name="schedule" :items="scheduleItems" :requestStatus="requestStatus"
-            @selected="dateSelected"></calendar-component>
+            @selected="dateSelected" :isOwner="this.resource.owner"></calendar-component>
         </div>
       </div>
     </div>

@@ -1982,7 +1982,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 /* harmony default export */ __webpack_exports__["default"] = ({
-  props: ['date', 'name', 'items', 'requestStatus'],
+  props: ['date', 'name', 'items', 'requestStatus', 'isOwner'],
   data: function data() {
     return {
       monthNumber: 1,
@@ -2077,7 +2077,11 @@ __webpack_require__.r(__webpack_exports__);
       if (this.items) {
         for (var i = 0; i < this.items.length; i++) {
           for (var j = 0; j < this.items[i].resource_day_items.length; j++) {
-            if (this.items[i].resource_day_items[j].timestamp == day.dateString) temp += 'bg-dark text-light';
+            if (this.items[i].resource_day_items[j].timestamp == day.dateString) {
+              if (this.isOwner) {
+                if (this.items[i].approved) temp += 'bg-success';else temp += 'bg-warning';
+              } else temp += 'bg-dark text-light';
+            }
           }
         }
       }
@@ -38802,7 +38806,8 @@ var render = function() {
               attrs: {
                 name: "schedule",
                 items: _vm.scheduleItems,
-                requestStatus: _vm.requestStatus
+                requestStatus: _vm.requestStatus,
+                isOwner: this.resource.owner
               },
               on: { selected: _vm.dateSelected }
             })

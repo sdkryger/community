@@ -73,7 +73,7 @@
 
 <script>
   export default{
-    props:['date','name','items','requestStatus'],
+    props:['date','name','items','requestStatus','isOwner'],
     data(){
       return{
         monthNumber:1,
@@ -166,8 +166,16 @@
         if(this.items){
           for(var i=0;i<this.items.length;i++){
             for(var j=0;j<this.items[i].resource_day_items.length;j++){
-              if(this.items[i].resource_day_items[j].timestamp == day.dateString)
-                temp += 'bg-dark text-light';
+              if(this.items[i].resource_day_items[j].timestamp == day.dateString){
+                if(this.isOwner){
+                  if(this.items[i].approved)
+                    temp += 'bg-success';
+                  else
+                    temp += 'bg-warning';
+                }else
+                  temp += 'bg-dark text-light';
+              }
+                
             }
           }
         }
