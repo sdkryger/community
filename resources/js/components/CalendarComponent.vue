@@ -187,18 +187,34 @@
           for(var i=0;i<this.items.length;i++){
             for(var j=0;j<this.items[i].resource_day_items.length;j++){
               if(this.items[i].resource_day_items[j].timestamp == day.dateString){
+                switch(this.items[i].resource_day_items[j].type){
+                  case 'only':
+                    //temp += ' border border-secondary';
+                    break;
+                  case 'start':
+                    temp += ' border border-right-0 border-secondary';
+                    break;
+                  case 'end':
+                    temp += ' border border-left-0 border-secondary';
+                    break;
+                  default:
+                    temp += ' border-top border-bottom border-secondary';
+                    break;
+                }
                 if(this.isOwner){
                   if(this.items[i].approved)
-                    temp += 'bg-success';
+                    temp += ' bg-success';
                   else
-                    temp += 'bg-warning';
+                    temp += ' bg-warning';
                 }else
-                  temp += 'bg-dark text-light';
+                  temp += ' bg-dark text-light';
               }
                 
             }
           }
         }
+        
+        
         return temp;
       }
     },

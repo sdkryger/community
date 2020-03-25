@@ -114,7 +114,22 @@
           function(data){
             console.log("got schedule items");
             for(var i=0;i<data.length;i++){
+              //iterate through requests
+              var numDays = data[i].resource_day_items.length;
               for(var j=0;j<data[i].resource_day_items.length;j++){
+                //iterate through day items in request
+                if(j==0){
+                  //first day type
+                  if(numDays == 1)
+                    data[i].resource_day_items[j].type = 'only';
+                  else
+                    data[i].resource_day_items[j].type = 'start';
+                }else if (j==numDays - 1){
+                  //last day
+                  data[i].resource_day_items[j].type = 'end';
+                }else{
+                  data[i].resource_day_items[j].type = 'middle';
+                }
                 data[i].resource_day_items[j].timestamp = data[i].resource_day_items[j].timestamp.substr(0,10);
               }
             }

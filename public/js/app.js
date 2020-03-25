@@ -2101,9 +2101,27 @@ __webpack_require__.r(__webpack_exports__);
         for (var i = 0; i < this.items.length; i++) {
           for (var j = 0; j < this.items[i].resource_day_items.length; j++) {
             if (this.items[i].resource_day_items[j].timestamp == day.dateString) {
+              switch (this.items[i].resource_day_items[j].type) {
+                case 'only':
+                  //temp += ' border border-secondary';
+                  break;
+
+                case 'start':
+                  temp += ' border border-right-0 border-secondary';
+                  break;
+
+                case 'end':
+                  temp += ' border border-left-0 border-secondary';
+                  break;
+
+                default:
+                  temp += ' border-top border-bottom border-secondary';
+                  break;
+              }
+
               if (this.isOwner) {
-                if (this.items[i].approved) temp += 'bg-success';else temp += 'bg-warning';
-              } else temp += 'bg-dark text-light';
+                if (this.items[i].approved) temp += ' bg-success';else temp += ' bg-warning';
+              } else temp += ' bg-dark text-light';
             }
           }
         }
@@ -2573,7 +2591,21 @@ __webpack_require__.r(__webpack_exports__);
         console.log("got schedule items");
 
         for (var i = 0; i < data.length; i++) {
+          //iterate through requests
+          var numDays = data[i].resource_day_items.length;
+
           for (var j = 0; j < data[i].resource_day_items.length; j++) {
+            //iterate through day items in request
+            if (j == 0) {
+              //first day type
+              if (numDays == 1) data[i].resource_day_items[j].type = 'only';else data[i].resource_day_items[j].type = 'start';
+            } else if (j == numDays - 1) {
+              //last day
+              data[i].resource_day_items[j].type = 'end';
+            } else {
+              data[i].resource_day_items[j].type = 'middle';
+            }
+
             data[i].resource_day_items[j].timestamp = data[i].resource_day_items[j].timestamp.substr(0, 10);
           }
         }
