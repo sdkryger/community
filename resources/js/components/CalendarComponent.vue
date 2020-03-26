@@ -73,7 +73,7 @@
 
 <script>
   export default{
-    props:['date','name','items','requestStatus','isOwner'],
+    props:['date','name','items','requestStatus','isOwner','parentMonthNumber','parentYear'],
     data(){
       return{
         monthNumber:1,
@@ -223,6 +223,16 @@
       var temp = new Date();
       this.year = temp.getFullYear();
       this.monthNumber = temp.getMonth()+1;
+    },
+    watch:{
+      parentMonthNumber(val){
+        console.log("should update month number to :"+val);
+        this.monthNumber = val;
+      },
+      parentYear(val){
+        console.log("should update year to: "+val);
+        this.year = val;
+      }
     }
   }
 </script>

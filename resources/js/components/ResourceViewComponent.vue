@@ -36,7 +36,8 @@
         <div class="col">
           <calendar-component class="mb-2" name="schedule" :items="scheduleItems" :requestStatus="requestStatus"
             @selected="dateSelected" :isOwner="this.resource.owner"
-            @request="requestSelected"></calendar-component>
+            @request="requestSelected" :parentMonthNumber="this.monthNumber"
+            :parentYear="this.year"></calendar-component>
         </div>
       </div>
     </div>
@@ -51,13 +52,25 @@
           </div>
           <div class="modal-body">
             <span v-if="scheduleItemIndex != -1">
-              Requested by: {{scheduleItems[scheduleItemIndex].user.name}}
+              <div>
+                Requested by: {{scheduleItems[scheduleItemIndex].user.name}}
+              </div>
+              <div>
+                Starting: {{scheduleItems[scheduleItemIndex].start.substr(0,10)}}
+              </div>
+              <div>
+                Ending: {{scheduleItems[scheduleItemIndex].end.substr(0,10)}}
+              </div>
             </span>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary" @click="rejectRequest">Reject</button>
-            <button type="button" class="btn btn-primary" @click="approveRequest">Approve</button>
+            <template v-if="scheduleItemIndex != -1">
+            <button type="button" class="btn btn-primary" @click="rejectRequest"
+              v-if="!scheduleItems[scheduleItemIndex].approved">Reject</button>
+            <button type="button" class="btn btn-primary" @click="approveRequest"
+              v-if="!scheduleItems[scheduleItemIndex].approved">Approve</button>
+            </template>
           </div>
         </div>
       </div>
@@ -75,7 +88,9 @@
         requestedEnd:'',
         requestStatus:'notStarted',
         title:'',
-        scheduleItemIndex:-1
+        scheduleItemIndex:-1,
+        monthNumber:-1,
+        year:-1
       }
     },
     props:['csrf','resource'],
@@ -101,11 +116,11 @@
       requestSelected(data){
         console.log("Request selected: "+JSON.stringify(data));
         console.log("Should process click on requestIndex: "+data.index);
-        if(!this.scheduleItems[data.index].approved){
-          console.log("This request is not approved");
+        //if(!this.scheduleItems[data.index].approved){
+          //console.log("This request is not approved");
           this.scheduleItemIndex = data.index;
           $("#requestModal").modal('show');
-        }
+        //}
       },
       updateSchedule(){
         var self = this;
@@ -208,7 +223,11 @@
           if(!this.scheduleItems[i].approved && index == -1)
             index = i;
         }
-        alert("should the request at index: "+index);
+        //alert("should the request at index: "+index);
+        this.scheduleItemIndex = index;
+        this.monthNumber = parseInt(this.scheduleItems[index].start.substr(5,2));
+        this.year = parseInt(this.scheduleItems[index].start.substr(0,4));
+        $("#requestModal").modal('show');
       }
     },
     computed:{

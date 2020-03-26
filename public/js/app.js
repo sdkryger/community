@@ -1982,7 +1982,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 /* harmony default export */ __webpack_exports__["default"] = ({
-  props: ['date', 'name', 'items', 'requestStatus', 'isOwner'],
+  props: ['date', 'name', 'items', 'requestStatus', 'isOwner', 'parentMonthNumber', 'parentYear'],
   data: function data() {
     return {
       monthNumber: 1,
@@ -2135,6 +2135,16 @@ __webpack_require__.r(__webpack_exports__);
     var temp = new Date();
     this.year = temp.getFullYear();
     this.monthNumber = temp.getMonth() + 1;
+  },
+  watch: {
+    parentMonthNumber: function parentMonthNumber(val) {
+      console.log("should update month number to :" + val);
+      this.monthNumber = val;
+    },
+    parentYear: function parentYear(val) {
+      console.log("should update year to: " + val);
+      this.year = val;
+    }
   }
 });
 
@@ -2543,6 +2553,19 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -2552,7 +2575,9 @@ __webpack_require__.r(__webpack_exports__);
       requestedEnd: '',
       requestStatus: 'notStarted',
       title: '',
-      scheduleItemIndex: -1
+      scheduleItemIndex: -1,
+      monthNumber: -1,
+      year: -1
     };
   },
   props: ['csrf', 'resource'],
@@ -2577,13 +2602,11 @@ __webpack_require__.r(__webpack_exports__);
     },
     requestSelected: function requestSelected(data) {
       console.log("Request selected: " + JSON.stringify(data));
-      console.log("Should process click on requestIndex: " + data.index);
+      console.log("Should process click on requestIndex: " + data.index); //if(!this.scheduleItems[data.index].approved){
+      //console.log("This request is not approved");
 
-      if (!this.scheduleItems[data.index].approved) {
-        console.log("This request is not approved");
-        this.scheduleItemIndex = data.index;
-        $("#requestModal").modal('show');
-      }
+      this.scheduleItemIndex = data.index;
+      $("#requestModal").modal('show'); //}
     },
     updateSchedule: function updateSchedule() {
       var self = this;
@@ -2665,9 +2688,13 @@ __webpack_require__.r(__webpack_exports__);
 
       for (var i = 0; i < this.scheduleItems.length; i++) {
         if (!this.scheduleItems[i].approved && index == -1) index = i;
-      }
+      } //alert("should the request at index: "+index);
 
-      alert("should the request at index: " + index);
+
+      this.scheduleItemIndex = index;
+      this.monthNumber = parseInt(this.scheduleItems[index].start.substr(5, 2));
+      this.year = parseInt(this.scheduleItems[index].start.substr(0, 4));
+      $("#requestModal").modal('show');
     }
   },
   computed: {
@@ -38962,7 +38989,9 @@ var render = function() {
                   name: "schedule",
                   items: _vm.scheduleItems,
                   requestStatus: _vm.requestStatus,
-                  isOwner: this.resource.owner
+                  isOwner: this.resource.owner,
+                  parentMonthNumber: this.monthNumber,
+                  parentYear: this.year
                 },
                 on: { selected: _vm.dateSelected, request: _vm.requestSelected }
               })
@@ -38996,47 +39025,86 @@ var render = function() {
               _c("div", { staticClass: "modal-body" }, [
                 _vm.scheduleItemIndex != -1
                   ? _c("span", [
-                      _vm._v(
-                        "\n            Requested by: " +
-                          _vm._s(
-                            _vm.scheduleItems[_vm.scheduleItemIndex].user.name
-                          ) +
-                          "\n          "
-                      )
+                      _c("div", [
+                        _vm._v(
+                          "\n              Requested by: " +
+                            _vm._s(
+                              _vm.scheduleItems[_vm.scheduleItemIndex].user.name
+                            ) +
+                            "\n            "
+                        )
+                      ]),
+                      _vm._v(" "),
+                      _c("div", [
+                        _vm._v(
+                          "\n              Starting: " +
+                            _vm._s(
+                              _vm.scheduleItems[
+                                _vm.scheduleItemIndex
+                              ].start.substr(0, 10)
+                            ) +
+                            "\n            "
+                        )
+                      ]),
+                      _vm._v(" "),
+                      _c("div", [
+                        _vm._v(
+                          "\n              Ending: " +
+                            _vm._s(
+                              _vm.scheduleItems[
+                                _vm.scheduleItemIndex
+                              ].end.substr(0, 10)
+                            ) +
+                            "\n            "
+                        )
+                      ])
                     ])
                   : _vm._e()
               ]),
               _vm._v(" "),
-              _c("div", { staticClass: "modal-footer" }, [
-                _c(
-                  "button",
-                  {
-                    staticClass: "btn btn-secondary",
-                    attrs: { type: "button", "data-dismiss": "modal" }
-                  },
-                  [_vm._v("Close")]
-                ),
-                _vm._v(" "),
-                _c(
-                  "button",
-                  {
-                    staticClass: "btn btn-primary",
-                    attrs: { type: "button" },
-                    on: { click: _vm.rejectRequest }
-                  },
-                  [_vm._v("Reject")]
-                ),
-                _vm._v(" "),
-                _c(
-                  "button",
-                  {
-                    staticClass: "btn btn-primary",
-                    attrs: { type: "button" },
-                    on: { click: _vm.approveRequest }
-                  },
-                  [_vm._v("Approve")]
-                )
-              ])
+              _c(
+                "div",
+                { staticClass: "modal-footer" },
+                [
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-secondary",
+                      attrs: { type: "button", "data-dismiss": "modal" }
+                    },
+                    [_vm._v("Close")]
+                  ),
+                  _vm._v(" "),
+                  _vm.scheduleItemIndex != -1
+                    ? [
+                        !_vm.scheduleItems[_vm.scheduleItemIndex].approved
+                          ? _c(
+                              "button",
+                              {
+                                staticClass: "btn btn-primary",
+                                attrs: { type: "button" },
+                                on: { click: _vm.rejectRequest }
+                              },
+                              [_vm._v("Reject")]
+                            )
+                          : _vm._e(),
+                        _vm._v(" "),
+                        !_vm.scheduleItems[_vm.scheduleItemIndex].approved
+                          ? _c(
+                              "button",
+                              {
+                                staticClass: "btn btn-primary",
+                                attrs: { type: "button" },
+                                on: { click: _vm.approveRequest }
+                              },
+                              [_vm._v("Approve")]
+                            )
+                          : _vm._e()
+                      ]
+                    : _vm._e()
+                ],
+                2
+              )
             ])
           ]
         )
