@@ -26,7 +26,7 @@
           </div>
         </div>
         <div class="w-100"></div>
-        <template v-if="requestResponseRequired>0">
+        <template v-if="requestResponseRequired>0 && resource.owner">
           <div class="col alert alert-warning">
             <span>Unapproved requests to review: {{requestResponseRequired}}</span>
             <div class="btn btn-primary" @click="reviewRequest">Review request</div>
@@ -39,6 +39,16 @@
             @request="requestSelected" :parentMonthNumber="this.monthNumber"
             :parentYear="this.year"></calendar-component>
         </div>
+      </div>
+      <div class="row border border-secondary mt-1 mb-1" v-if="resource.owner">
+        <div class="col-12 h4 mt-2">
+          Groups
+        </div>
+        <ul class="list-group col-12">
+            <li class="list-group-item d-flex justify-content-between" v-for="(group, index) in groups">
+              <div>{{group.name}}</div> <div>Access: <input type="checkbox" v-model="group.access" @change="setAccess(index)"></div>
+            </li>
+          </ul>
       </div>
     </div>
     <div class="modal fade" id="requestModal" tabindex="-1" role="dialog" aria-hidden="true">
@@ -90,13 +100,18 @@
         title:'',
         scheduleItemIndex:-1,
         monthNumber:-1,
-        year:-1
+        year:-1,
+        groups:[]
       }
     },
     props:['csrf','resource'],
     mounted(){
       this.title = this.resource.title;
       this.updateSchedule();
+      if(this.resource.owner){
+        this.getResourceGroups();
+      }
+        
     },
     methods:{
       dateSelected(data){
@@ -112,6 +127,16 @@
             break;
 
         }
+      },
+      getResourceGroups(){
+        var self = this;
+        $.get(
+          '/resources/groups/'+this.resource.id,
+          function(data){
+            self.groups = data;
+          },
+          'json'
+        )
       },
       requestSelected(data){
         console.log("Request selected: "+JSON.stringify(data));
@@ -155,6 +180,21 @@
       },
       startRequest(){
         this.requestStatus='selectStart';
+      },
+      setAccess(index){
+        var self = this;
+        $.get(
+          '/resources/groupAssignment',
+          {
+            groupId:self.groups[index].id,
+            resourceId:self.resource.id,
+            access:self.groups[index].access
+          },
+          function(data){
+            self.getResourceGroups();
+          },
+          'json'
+        )
       },
       sendRequest(){
         var self = this;

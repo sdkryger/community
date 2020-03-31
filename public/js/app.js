@@ -2327,12 +2327,32 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
       message: 'home component',
       groups: [],
-      allResources: []
+      allResources: [],
+      myRequests: []
     };
   },
   methods: {
@@ -2347,11 +2367,18 @@ __webpack_require__.r(__webpack_exports__);
       $.get('/resources', function (data) {
         self.allResources = data;
       }, 'json');
+    },
+    updateMyRequests: function updateMyRequests() {
+      var self = this;
+      $.get('/resources/myRequests', function (data) {
+        self.myRequests = data;
+      }, 'json');
     }
   },
   mounted: function mounted() {
     this.updateGroupList();
     this.updateAllResources();
+    this.updateMyRequests();
   }
 });
 
@@ -2566,6 +2593,16 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -2577,13 +2614,18 @@ __webpack_require__.r(__webpack_exports__);
       title: '',
       scheduleItemIndex: -1,
       monthNumber: -1,
-      year: -1
+      year: -1,
+      groups: []
     };
   },
   props: ['csrf', 'resource'],
   mounted: function mounted() {
     this.title = this.resource.title;
     this.updateSchedule();
+
+    if (this.resource.owner) {
+      this.getResourceGroups();
+    }
   },
   methods: {
     dateSelected: function dateSelected(data) {
@@ -2599,6 +2641,12 @@ __webpack_require__.r(__webpack_exports__);
           this.requestStatus = 'awaitingSubmit';
           break;
       }
+    },
+    getResourceGroups: function getResourceGroups() {
+      var self = this;
+      $.get('/resources/groups/' + this.resource.id, function (data) {
+        self.groups = data;
+      }, 'json');
     },
     requestSelected: function requestSelected(data) {
       console.log("Request selected: " + JSON.stringify(data));
@@ -2638,6 +2686,16 @@ __webpack_require__.r(__webpack_exports__);
     },
     startRequest: function startRequest() {
       this.requestStatus = 'selectStart';
+    },
+    setAccess: function setAccess(index) {
+      var self = this;
+      $.get('/resources/groupAssignment', {
+        groupId: self.groups[index].id,
+        resourceId: self.resource.id,
+        access: self.groups[index].access
+      }, function (data) {
+        self.getResourceGroups();
+      }, 'json');
     },
     sendRequest: function sendRequest() {
       var self = this;
@@ -38565,6 +38623,14 @@ var render = function() {
                         )
                       : _vm._e(),
                     _vm._v(" "),
+                    resource.notInGroup
+                      ? _c(
+                          "span",
+                          { staticClass: "badge badge-pill badge-warning" },
+                          [_vm._v("Not available to groups")]
+                        )
+                      : _vm._e(),
+                    _vm._v(" "),
                     resource.scheduleRequests > 0
                       ? _c(
                           "span",
@@ -38585,6 +38651,63 @@ var render = function() {
           ]),
           _vm._v(" "),
           _vm._m(1)
+        ])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "row mt-1" }, [
+        _c("div", { staticClass: "col card pr-0 pl-0" }, [
+          _c("div", { staticClass: "card-header h4" }, [
+            _vm._v("\n          My requests\n        ")
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "card-body" }, [
+            _c(
+              "div",
+              { staticClass: "list-group list-group-flush" },
+              _vm._l(_vm.myRequests, function(request) {
+                return _c(
+                  "div",
+                  { staticClass: "list-group-item list-group-item-action" },
+                  [
+                    _c("span", [
+                      _vm._v(
+                        _vm._s(request.resource.title) +
+                          " - " +
+                          _vm._s(request.start_time.substr(0, 10)) +
+                          " to " +
+                          _vm._s(request.end_time.substr(0, 10))
+                      )
+                    ]),
+                    _vm._v(" "),
+                    request.approved
+                      ? _c(
+                          "span",
+                          { staticClass: "badge badge-pill badge-success" },
+                          [_vm._v("Approved")]
+                        )
+                      : _vm._e(),
+                    _vm._v(" "),
+                    request.deleted_at
+                      ? _c(
+                          "span",
+                          { staticClass: "badge badge-pill badge-danger" },
+                          [_vm._v("Rejected")]
+                        )
+                      : _vm._e(),
+                    _vm._v(" "),
+                    !request.approved && !request.deleted_at
+                      ? _c(
+                          "span",
+                          { staticClass: "badge badge-pill badge-primary" },
+                          [_vm._v("Pending")]
+                        )
+                      : _vm._e()
+                  ]
+                )
+              }),
+              0
+            )
+          ])
         ])
       ])
     ])
@@ -38955,7 +39078,7 @@ var render = function() {
           _vm._v(" "),
           _c("div", { staticClass: "w-100" }),
           _vm._v(" "),
-          _vm.requestResponseRequired > 0
+          _vm.requestResponseRequired > 0 && _vm.resource.owner
             ? [
                 _c("div", { staticClass: "col alert alert-warning" }, [
                   _c("span", [
@@ -39000,7 +39123,84 @@ var render = function() {
           )
         ],
         2
-      )
+      ),
+      _vm._v(" "),
+      _vm.resource.owner
+        ? _c("div", { staticClass: "row border border-secondary mt-1 mb-1" }, [
+            _c("div", { staticClass: "col-12 h4 mt-2" }, [
+              _vm._v("\n        Groups\n      ")
+            ]),
+            _vm._v(" "),
+            _c(
+              "ul",
+              { staticClass: "list-group col-12" },
+              _vm._l(_vm.groups, function(group, index) {
+                return _c(
+                  "li",
+                  {
+                    staticClass:
+                      "list-group-item d-flex justify-content-between"
+                  },
+                  [
+                    _c("div", [_vm._v(_vm._s(group.name))]),
+                    _vm._v(" "),
+                    _c("div", [
+                      _vm._v("Access: "),
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: group.access,
+                            expression: "group.access"
+                          }
+                        ],
+                        attrs: { type: "checkbox" },
+                        domProps: {
+                          checked: Array.isArray(group.access)
+                            ? _vm._i(group.access, null) > -1
+                            : group.access
+                        },
+                        on: {
+                          change: [
+                            function($event) {
+                              var $$a = group.access,
+                                $$el = $event.target,
+                                $$c = $$el.checked ? true : false
+                              if (Array.isArray($$a)) {
+                                var $$v = null,
+                                  $$i = _vm._i($$a, $$v)
+                                if ($$el.checked) {
+                                  $$i < 0 &&
+                                    _vm.$set(group, "access", $$a.concat([$$v]))
+                                } else {
+                                  $$i > -1 &&
+                                    _vm.$set(
+                                      group,
+                                      "access",
+                                      $$a
+                                        .slice(0, $$i)
+                                        .concat($$a.slice($$i + 1))
+                                    )
+                                }
+                              } else {
+                                _vm.$set(group, "access", $$c)
+                              }
+                            },
+                            function($event) {
+                              return _vm.setAccess(index)
+                            }
+                          ]
+                        }
+                      })
+                    ])
+                  ]
+                )
+              }),
+              0
+            )
+          ])
+        : _vm._e()
     ]),
     _vm._v(" "),
     _c(

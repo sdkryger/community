@@ -33,12 +33,31 @@
                 class="list-group-item list-group-item-action">
                 <span>{{resource.title}}</span>
                 <span v-if="resource.isOwner" class="badge badge-pill badge-primary">Mine</span>
+                <span v-if="resource.notInGroup" class="badge badge-pill badge-warning">Not available to groups</span>
                 <span v-if="resource.scheduleRequests>0" class="badge badge-pill badge-primary">Schedule requests: {{resource.scheduleRequests}}</span>
               </a>
             </div>
           </div>
           <div class="card-footer">
             <a class="btn btn-primary" role="button" href="/resources/-1">New</a>
+          </div>
+        </div>
+      </div>
+      <div class="row mt-1">
+        <div class="col card pr-0 pl-0">
+          <div class="card-header h4">
+            My requests
+          </div>
+          <div class="card-body">
+            <div class="list-group list-group-flush">
+              <div v-for="request in myRequests" 
+                class="list-group-item list-group-item-action">
+                <span>{{request.resource.title}} - {{request.start_time.substr(0,10)}} to {{request.end_time.substr(0,10)}}</span>
+                <span v-if="request.approved" class="badge badge-pill badge-success">Approved</span>
+                <span v-if="request.deleted_at" class="badge badge-pill badge-danger">Rejected</span>
+                <span v-if="!request.approved && !request.deleted_at" class="badge badge-pill badge-primary">Pending</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -52,7 +71,8 @@
       return{
         message:'home component',
         groups:[],
-        allResources:[]
+        allResources:[],
+        myRequests:[]
       }
     },
     methods:{
@@ -75,11 +95,22 @@
           },
           'json'
         )
+      },
+      updateMyRequests(){
+        var self = this;
+        $.get(
+          '/resources/myRequests',
+          function(data){
+            self.myRequests = data;
+          },
+          'json'
+        )
       }
     },
     mounted(){
       this.updateGroupList();
       this.updateAllResources();
+      this.updateMyRequests();
     }
   }
 </script>

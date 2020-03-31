@@ -47,6 +47,32 @@ class ResourceController extends Controller
       }else
         $resource->isOwner = false;
     }
+
+    $myResources = Resource::where('user_id',$user->id)->get();
+    foreach($myResources as $resource){
+      //check if in list already
+      $found = false;
+      foreach($resources as $existingResource){
+        if($resource->id == $existingResource->id)
+          $found = true;
+      }
+      if(!$found){
+        $resource->isOwner = true;
+        $resource->notInGroup = true;
+        $resource->resourceSchedules;
+        $i = 0;
+        $schedules = array();
+        foreach($resource->resourceSchedules as $sched){
+          if(is_null($sched['approved']))
+            array_push($schedules, $sched);
+          $i++;
+        }
+        unset($resource->resourceSchedules);
+        $resource->scheduleRequests = count($schedules);
+        $resources->push($resource);
+      }
+    }
+
     return $resources;
   }
 
@@ -195,7 +221,7 @@ class ResourceController extends Controller
       }
     }
     $resource = Resource::where('id',$id)->first();
-    if($resource && $access){
+    if($resource && $access || $resource->user_id == $user->id){
       $resource->owner = $resource->user_id == $user->id;
       return view('resourceView',['resource'=>$resource]);
     }else{
@@ -312,5 +338,12 @@ class ResourceController extends Controller
       return $resourceSchedule;
     }else
       abort(403, 'Unauthorized action.');
+  }
+
+  public function myRequests(){
+    $requests = ResourceSchedule::withTrashed()->where('user_id',Auth()->user()->id)->get();
+    foreach($requests as $request)
+      $request->resource;
+    return $requests;
   }
 }
