@@ -11,20 +11,22 @@
         </div>
       </div>
       <div class="row">
-        <form action="/resources/addImage" class="col-12" method="post" enctype="multipart/form-data" v-if="this.resource.owner">
-          <div class="form-group">
-            <label>New image</label>
-            <input type="file" name="file">
-          </div>
-          <input type="hidden" v-model="csrf" name="_token">
-          <input type="hidden" v-model="resource.id" name="resourceId">
-          <input type="submit" value="Ok">
-        </form>
+        
         <div class="col-12">
           <img :src="'/'+images[activeImageIndex].path" v-if="images.length > 0" style="max-height:300px;"><br>
+          <div class="btn btn-secondary m-1" @click="deleteImage()" v-if="resource.owner">Delete</div><br>
           <img v-for="(image, index) in images" :src="'/'+image.path" style="max-width:80px;max-height:80px;" class="m-1"
             :class="[index == activeImageIndex ? 'border border-danger' : '']" @click="setImageIndex(index)">
         </div>
+        <form action="/resources/addImage" class="col-12 border border-secondary p-2" method="post" enctype="multipart/form-data" v-if="this.resource.owner">
+          <div class="form-group">
+            <label>Add image</label>
+            <input type="file" name="file" class="form-control">
+          </div>
+          <input type="hidden" v-model="csrf" name="_token">
+          <input type="hidden" v-model="resource.id" name="resourceId">
+          <input type="submit" value="Ok" class="btn btn-primary">
+        </form>
       </div>
       <div class="row border border-secondary mt-1 mb-1">
         <div class="col h3 mt-3">
@@ -226,6 +228,24 @@
       },
       setImageIndex(index){
         this.activeImageIndex = index;
+      },
+      deleteImage(){
+        var self= this;
+        $.get(
+          '/resources/deleteImage',
+          {
+            _token:self.csrf,
+            imageId:self.images[self.activeImageIndex].id
+          },
+          function(data){
+            if(data.error){
+              alert(data.message);
+            }else{
+              self.getResourceImages();
+            }
+          },
+          'json'
+        )
       },
       sendRequest(){
         var self = this;

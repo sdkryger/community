@@ -35,6 +35,7 @@ Route::resource('groups', 'GroupController');
 
 Route::get('/resources','ResourceController@listResources');
 Route::post('/resources/addImage','ResourceController@addImage');
+Route::get('/resources/deleteImage','ResourceController@deleteImage');
 Route::get('/resources/images/{id}','ResourceController@getImages');
 Route::get('/myResources','ResourceController@myResources');
 Route::get('/resources/groupAssignment','ResourceController@groupAssignment');

@@ -2619,6 +2619,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -2725,6 +2727,19 @@ __webpack_require__.r(__webpack_exports__);
     },
     setImageIndex: function setImageIndex(index) {
       this.activeImageIndex = index;
+    },
+    deleteImage: function deleteImage() {
+      var self = this;
+      $.get('/resources/deleteImage', {
+        _token: self.csrf,
+        imageId: self.images[self.activeImageIndex].id
+      }, function (data) {
+        if (data.error) {
+          alert(data.message);
+        } else {
+          self.getResourceImages();
+        }
+      }, 'json');
     },
     sendRequest: function sendRequest() {
       var self = this;
@@ -39029,11 +39044,58 @@ var render = function() {
       ]),
       _vm._v(" "),
       _c("div", { staticClass: "row" }, [
+        _c(
+          "div",
+          { staticClass: "col-12" },
+          [
+            _vm.images.length > 0
+              ? _c("img", {
+                  staticStyle: { "max-height": "300px" },
+                  attrs: { src: "/" + _vm.images[_vm.activeImageIndex].path }
+                })
+              : _vm._e(),
+            _c("br"),
+            _vm._v(" "),
+            _vm.resource.owner
+              ? _c(
+                  "div",
+                  {
+                    staticClass: "btn btn-secondary m-1",
+                    on: {
+                      click: function($event) {
+                        return _vm.deleteImage()
+                      }
+                    }
+                  },
+                  [_vm._v("Delete")]
+                )
+              : _vm._e(),
+            _c("br"),
+            _vm._v(" "),
+            _vm._l(_vm.images, function(image, index) {
+              return _c("img", {
+                staticClass: "m-1",
+                class: [
+                  index == _vm.activeImageIndex ? "border border-danger" : ""
+                ],
+                staticStyle: { "max-width": "80px", "max-height": "80px" },
+                attrs: { src: "/" + image.path },
+                on: {
+                  click: function($event) {
+                    return _vm.setImageIndex(index)
+                  }
+                }
+              })
+            })
+          ],
+          2
+        ),
+        _vm._v(" "),
         this.resource.owner
           ? _c(
               "form",
               {
-                staticClass: "col-12",
+                staticClass: "col-12 border border-secondary p-2",
                 attrs: {
                   action: "/resources/addImage",
                   method: "post",
@@ -39085,41 +39147,13 @@ var render = function() {
                   }
                 }),
                 _vm._v(" "),
-                _c("input", { attrs: { type: "submit", value: "Ok" } })
+                _c("input", {
+                  staticClass: "btn btn-primary",
+                  attrs: { type: "submit", value: "Ok" }
+                })
               ]
             )
-          : _vm._e(),
-        _vm._v(" "),
-        _c(
-          "div",
-          { staticClass: "col-12" },
-          [
-            _vm.images.length > 0
-              ? _c("img", {
-                  staticStyle: { "max-height": "300px" },
-                  attrs: { src: "/" + _vm.images[_vm.activeImageIndex].path }
-                })
-              : _vm._e(),
-            _c("br"),
-            _vm._v(" "),
-            _vm._l(_vm.images, function(image, index) {
-              return _c("img", {
-                staticClass: "m-1",
-                class: [
-                  index == _vm.activeImageIndex ? "border border-danger" : ""
-                ],
-                staticStyle: { "max-width": "80px", "max-height": "80px" },
-                attrs: { src: "/" + image.path },
-                on: {
-                  click: function($event) {
-                    return _vm.setImageIndex(index)
-                  }
-                }
-              })
-            })
-          ],
-          2
-        )
+          : _vm._e()
       ]),
       _vm._v(" "),
       _c(
@@ -39441,9 +39475,12 @@ var staticRenderFns = [
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
     return _c("div", { staticClass: "form-group" }, [
-      _c("label", [_vm._v("New image")]),
+      _c("label", [_vm._v("Add image")]),
       _vm._v(" "),
-      _c("input", { attrs: { type: "file", name: "file" } })
+      _c("input", {
+        staticClass: "form-control",
+        attrs: { type: "file", name: "file" }
+      })
     ])
   },
   function() {

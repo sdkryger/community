@@ -358,7 +358,22 @@ class ResourceController extends Controller
     $resourceImage->resource()->associate($resource);
     $resourceImage->path = $path;
     $resourceImage->save();
-    return $path;
+    return redirect('/resources/view/'.$resource->id);
+  }
+
+  public function deleteImage(Request $request){
+    $response = new \stdClass();
+    $response->error = true;
+    $response->message = 'Not authorized';
+    $image = ResourceImage::where('id',$request['imageId'])->where('user_id',Auth::user()->id)->first();
+    if($image){
+      $path = $image->path;
+      $image->delete();
+      Storage::delete($path);
+      $response->error = false;
+      $response->message = 'success';
+    }
+    return response(json_encode($response))->header('Content-Type','application/json');
   }
 
   public function getImages($id){
