@@ -2621,6 +2621,13 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -2630,6 +2637,7 @@ __webpack_require__.r(__webpack_exports__);
       requestedEnd: '',
       requestStatus: 'notStarted',
       title: '',
+      description: '',
       scheduleItemIndex: -1,
       monthNumber: -1,
       year: -1,
@@ -2641,6 +2649,7 @@ __webpack_require__.r(__webpack_exports__);
   props: ['csrf', 'resource'],
   mounted: function mounted() {
     this.title = this.resource.title;
+    this.description = this.resource.description;
     this.updateSchedule();
 
     if (this.resource.owner) {
@@ -2797,6 +2806,21 @@ __webpack_require__.r(__webpack_exports__);
       this.monthNumber = parseInt(this.scheduleItems[index].start.substr(5, 2));
       this.year = parseInt(this.scheduleItems[index].start.substr(0, 4));
       $("#requestModal").modal('show');
+    },
+    updateResource: function updateResource() {
+      var self = this;
+      $.ajax({
+        method: 'PUT',
+        url: '/resources/' + self.resource.id,
+        data: {
+          _token: self.csrf,
+          title: self.title,
+          description: self.description
+        },
+        dataType: 'json'
+      }).done(function () {
+        if (data.error) alert(data.message);
+      });
     }
   },
   computed: {
@@ -39011,37 +39035,78 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "row" }, [
     _c("div", { staticClass: "col" }, [
-      _c("div", { staticClass: "row" }, [
-        this.resource.owner
-          ? _c("div", { staticClass: "form-group col" }, [
-              _c("label", [_vm._v("Title")]),
-              _vm._v(" "),
-              _c("input", {
-                directives: [
-                  {
-                    name: "model",
-                    rawName: "v-model",
-                    value: _vm.title,
-                    expression: "title"
-                  }
-                ],
-                staticClass: "form-control",
-                attrs: { type: "text" },
-                domProps: { value: _vm.title },
-                on: {
-                  input: function($event) {
-                    if ($event.target.composing) {
-                      return
+      _c(
+        "div",
+        { staticClass: "row" },
+        [
+          this.resource.owner
+            ? [
+                _c("div", { staticClass: "form-group col-12" }, [
+                  _c("label", [_vm._v("Title")]),
+                  _vm._v(" "),
+                  _c("input", {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.title,
+                        expression: "title"
+                      }
+                    ],
+                    staticClass: "form-control",
+                    attrs: { type: "text" },
+                    domProps: { value: _vm.title },
+                    on: {
+                      change: function($event) {
+                        return _vm.updateResource()
+                      },
+                      input: function($event) {
+                        if ($event.target.composing) {
+                          return
+                        }
+                        _vm.title = $event.target.value
+                      }
                     }
-                    _vm.title = $event.target.value
-                  }
-                }
-              })
-            ])
-          : _c("div", { staticClass: "col h4" }, [
-              _vm._v("\n        " + _vm._s(_vm.resource.title) + "\n      ")
-            ])
-      ]),
+                  })
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "form-group col-12" }, [
+                  _c("label", [_vm._v("Description")]),
+                  _vm._v(" "),
+                  _c("textarea", {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.description,
+                        expression: "description"
+                      }
+                    ],
+                    staticClass: "form-control",
+                    attrs: { type: "text", rows: "3", maxlength: "1500" },
+                    domProps: { value: _vm.description },
+                    on: {
+                      change: function($event) {
+                        return _vm.updateResource()
+                      },
+                      input: function($event) {
+                        if ($event.target.composing) {
+                          return
+                        }
+                        _vm.description = $event.target.value
+                      }
+                    }
+                  })
+                ])
+              ]
+            : _c("div", { staticClass: "col" }, [
+                _c("h4", [_vm._v(_vm._s(_vm.resource.title))]),
+                _vm._v(" "),
+                _c("p", [_vm._v(_vm._s(_vm.resource.description))])
+              ])
+        ],
+        2
+      ),
       _vm._v(" "),
       _c("div", { staticClass: "row" }, [
         _c(

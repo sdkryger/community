@@ -188,6 +188,8 @@ class ResourceController extends Controller
         $resource = Resource::where('id',$id)->where('user_id',$user->id)->first();
         if($resource){
           $resource->title = $title;
+          if($request['description'])
+            $resource->description = $request['description'];
           $resource->save();
           return $resource;
         }else{

@@ -2,12 +2,19 @@
   <div class="row">
     <div class="col">
       <div class="row">
-        <div class="form-group col" v-if="this.resource.owner">
-          <label>Title</label>
-          <input class="form-control" type="text" v-model="title">
-        </div>
-        <div class="col h4" v-else>
-          {{resource.title}}
+        <template  v-if="this.resource.owner">
+          <div class="form-group col-12">
+            <label>Title</label>
+            <input class="form-control" type="text" v-model="title" @change="updateResource()">
+          </div>
+          <div class="form-group col-12">
+            <label>Description</label>
+            <textarea class="form-control" type="text" v-model="description" @change="updateResource()" rows="3" maxlength="1500"></textarea>
+          </div>
+        </template>
+        <div class="col" v-else>
+          <h4>{{resource.title}}</h4>
+          <p>{{resource.description}}</p>
         </div>
       </div>
       <div class="row">
@@ -116,6 +123,7 @@
         requestedEnd:'',
         requestStatus:'notStarted',
         title:'',
+        description:'',
         scheduleItemIndex:-1,
         monthNumber:-1,
         year:-1,
@@ -127,6 +135,7 @@
     props:['csrf','resource'],
     mounted(){
       this.title = this.resource.title;
+      this.description = this.resource.description;
       this.updateSchedule();
       if(this.resource.owner){
         this.getResourceGroups();
@@ -319,6 +328,23 @@
         this.monthNumber = parseInt(this.scheduleItems[index].start.substr(5,2));
         this.year = parseInt(this.scheduleItems[index].start.substr(0,4));
         $("#requestModal").modal('show');
+      },
+      updateResource(){
+        var self = this;
+        $.ajax({
+            method: 'PUT',
+            url:'/resources/'+self.resource.id,
+            data:{
+              _token:self.csrf,
+              title:self.title,
+              description:self.description
+            },
+            dataType:'json'
+          })
+            .done(function(){
+              if(data.error)
+                alert(data.message);
+          });
       }
     },
     computed:{
