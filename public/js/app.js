@@ -2603,6 +2603,22 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -2615,7 +2631,9 @@ __webpack_require__.r(__webpack_exports__);
       scheduleItemIndex: -1,
       monthNumber: -1,
       year: -1,
-      groups: []
+      groups: [],
+      images: [],
+      activeImageIndex: 0
     };
   },
   props: ['csrf', 'resource'],
@@ -2626,6 +2644,8 @@ __webpack_require__.r(__webpack_exports__);
     if (this.resource.owner) {
       this.getResourceGroups();
     }
+
+    this.getResourceImages();
   },
   methods: {
     dateSelected: function dateSelected(data) {
@@ -2646,6 +2666,12 @@ __webpack_require__.r(__webpack_exports__);
       var self = this;
       $.get('/resources/groups/' + this.resource.id, function (data) {
         self.groups = data;
+      }, 'json');
+    },
+    getResourceImages: function getResourceImages() {
+      var self = this;
+      $.get('/resources/images/' + this.resource.id, function (data) {
+        self.images = data;
       }, 'json');
     },
     requestSelected: function requestSelected(data) {
@@ -2696,6 +2722,9 @@ __webpack_require__.r(__webpack_exports__);
       }, function (data) {
         self.getResourceGroups();
       }, 'json');
+    },
+    setImageIndex: function setImageIndex(index) {
+      this.activeImageIndex = index;
     },
     sendRequest: function sendRequest() {
       var self = this;
@@ -38999,6 +39028,100 @@ var render = function() {
             ])
       ]),
       _vm._v(" "),
+      _c("div", { staticClass: "row" }, [
+        this.resource.owner
+          ? _c(
+              "form",
+              {
+                staticClass: "col-12",
+                attrs: {
+                  action: "/resources/addImage",
+                  method: "post",
+                  enctype: "multipart/form-data"
+                }
+              },
+              [
+                _vm._m(0),
+                _vm._v(" "),
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.csrf,
+                      expression: "csrf"
+                    }
+                  ],
+                  attrs: { type: "hidden", name: "_token" },
+                  domProps: { value: _vm.csrf },
+                  on: {
+                    input: function($event) {
+                      if ($event.target.composing) {
+                        return
+                      }
+                      _vm.csrf = $event.target.value
+                    }
+                  }
+                }),
+                _vm._v(" "),
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.resource.id,
+                      expression: "resource.id"
+                    }
+                  ],
+                  attrs: { type: "hidden", name: "resourceId" },
+                  domProps: { value: _vm.resource.id },
+                  on: {
+                    input: function($event) {
+                      if ($event.target.composing) {
+                        return
+                      }
+                      _vm.$set(_vm.resource, "id", $event.target.value)
+                    }
+                  }
+                }),
+                _vm._v(" "),
+                _c("input", { attrs: { type: "submit", value: "Ok" } })
+              ]
+            )
+          : _vm._e(),
+        _vm._v(" "),
+        _c(
+          "div",
+          { staticClass: "col-12" },
+          [
+            _vm.images.length > 0
+              ? _c("img", {
+                  staticStyle: { "max-height": "300px" },
+                  attrs: { src: "/" + _vm.images[_vm.activeImageIndex].path }
+                })
+              : _vm._e(),
+            _c("br"),
+            _vm._v(" "),
+            _vm._l(_vm.images, function(image, index) {
+              return _c("img", {
+                staticClass: "m-1",
+                class: [
+                  index == _vm.activeImageIndex ? "border border-danger" : ""
+                ],
+                staticStyle: { "max-width": "80px", "max-height": "80px" },
+                attrs: { src: "/" + image.path },
+                on: {
+                  click: function($event) {
+                    return _vm.setImageIndex(index)
+                  }
+                }
+              })
+            })
+          ],
+          2
+        )
+      ]),
+      _vm._v(" "),
       _c(
         "div",
         { staticClass: "row border border-secondary mt-1 mb-1" },
@@ -39220,7 +39343,7 @@ var render = function() {
           { staticClass: "modal-dialog", attrs: { role: "document" } },
           [
             _c("div", { staticClass: "modal-content" }, [
-              _vm._m(0),
+              _vm._m(1),
               _vm._v(" "),
               _c("div", { staticClass: "modal-body" }, [
                 _vm.scheduleItemIndex != -1
@@ -39313,6 +39436,16 @@ var render = function() {
   ])
 }
 var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "form-group" }, [
+      _c("label", [_vm._v("New image")]),
+      _vm._v(" "),
+      _c("input", { attrs: { type: "file", name: "file" } })
+    ])
+  },
   function() {
     var _vm = this
     var _h = _vm.$createElement

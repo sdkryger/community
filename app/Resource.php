@@ -20,4 +20,8 @@ class Resource extends Model
   public function resourceSchedules(){
     return $this->hasMany('App\ResourceSchedule');
   }
+
+  public function images(){
+    return $this->hasMany('App\ResourceImage');
+  }
 }

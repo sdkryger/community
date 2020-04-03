@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use App\User;
 use App\Group;
 use App\Resource;
 use App\GroupUser;
 use App\ResourceSchedule;
 use App\ResourceDayItem;
+use App\ResourceImage;
 use Carbon\Carbon;
 
 class ResourceController extends Controller
@@ -346,4 +348,37 @@ class ResourceController extends Controller
       $request->resource;
     return $requests;
   }
+
+  public function addImage(Request $request){
+    $user = Auth::user();
+    $path = $request->file('file')->store('images');
+    $resource = Resource::where('id',$request['resourceId'])->first();
+    $resourceImage = new ResourceImage;
+    $resourceImage->user()->associate($user);
+    $resourceImage->resource()->associate($resource);
+    $resourceImage->path = $path;
+    $resourceImage->save();
+    return $path;
+  }
+
+  public function getImages($id){
+    $access = false;
+    $user = Auth::user();
+    $groups = $user->groups();
+    foreach($groups as $group){
+      $resources = $group->resources;
+      foreach($resources as $resource){
+        if($resource->id == $id){
+          $access = true;
+        }
+      }
+    }
+    if($access){
+      $resource = Resource::where('id',$id)->first();
+
+      return $resource->images;
+    }else
+      abort(403, 'Unauthorized action.');
+  }
+
 }

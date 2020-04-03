@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,6 +34,8 @@ Route::get('/groups/setAdmin', 'GroupController@setAdmin');
 Route::resource('groups', 'GroupController');
 
 Route::get('/resources','ResourceController@listResources');
+Route::post('/resources/addImage','ResourceController@addImage');
+Route::get('/resources/images/{id}','ResourceController@getImages');
 Route::get('/myResources','ResourceController@myResources');
 Route::get('/resources/groupAssignment','ResourceController@groupAssignment');
 Route::get('/resources/groups/{id}','ResourceController@listGroups');
@@ -44,5 +47,12 @@ Route::get('/resources/view/{id}','ResourceController@show');
 Route::get('/resources/{id}','ResourceController@edit');
 Route::put('/resources/{id}','ResourceController@update');
 Route::delete('/resources/{id}','ResourceController@destroy');
+
+Route::get('/images/{filename}',function($filename){
+  $contents = Storage::get('images/'.$filename);
+  $response = Response::make($contents,200);
+  $response->header("Content-Type",'image/png');
+  return $response;
+});
 
 

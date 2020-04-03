@@ -10,6 +10,22 @@
           {{resource.title}}
         </div>
       </div>
+      <div class="row">
+        <form action="/resources/addImage" class="col-12" method="post" enctype="multipart/form-data" v-if="this.resource.owner">
+          <div class="form-group">
+            <label>New image</label>
+            <input type="file" name="file">
+          </div>
+          <input type="hidden" v-model="csrf" name="_token">
+          <input type="hidden" v-model="resource.id" name="resourceId">
+          <input type="submit" value="Ok">
+        </form>
+        <div class="col-12">
+          <img :src="'/'+images[activeImageIndex].path" v-if="images.length > 0" style="max-height:300px;"><br>
+          <img v-for="(image, index) in images" :src="'/'+image.path" style="max-width:80px;max-height:80px;" class="m-1"
+            :class="[index == activeImageIndex ? 'border border-danger' : '']" @click="setImageIndex(index)">
+        </div>
+      </div>
       <div class="row border border-secondary mt-1 mb-1">
         <div class="col h3 mt-3">
           <span>Schedule</span> 
@@ -101,7 +117,9 @@
         scheduleItemIndex:-1,
         monthNumber:-1,
         year:-1,
-        groups:[]
+        groups:[],
+        images:[],
+        activeImageIndex: 0
       }
     },
     props:['csrf','resource'],
@@ -111,7 +129,7 @@
       if(this.resource.owner){
         this.getResourceGroups();
       }
-        
+      this.getResourceImages();
     },
     methods:{
       dateSelected(data){
@@ -134,6 +152,16 @@
           '/resources/groups/'+this.resource.id,
           function(data){
             self.groups = data;
+          },
+          'json'
+        )
+      },
+      getResourceImages(){
+        var self = this;
+        $.get(
+          '/resources/images/'+this.resource.id,
+          function(data){
+            self.images = data;
           },
           'json'
         )
@@ -195,6 +223,9 @@
           },
           'json'
         )
+      },
+      setImageIndex(index){
+        this.activeImageIndex = index;
       },
       sendRequest(){
         var self = this;

@@ -53,6 +53,10 @@ class User extends Authenticatable
       return $this->hasMany('App\Resource');
     }
 
+    public function resourceImages(){
+      return $this->hasMany('App\ResourceImage');
+    }
+
     public function sentMessages(){
       return $this->hasMany('App\Message');
     }
