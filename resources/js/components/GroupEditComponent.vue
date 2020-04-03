@@ -12,13 +12,16 @@
             Members
           </div>
           <ul class="list-group">
-            <li class="list-group-item" v-for="(member, index) in members">
-              Name: {{member.name}}, Admin: <input type="checkbox" v-model="member.is_admin" @change="setAdmin(index)">
+            <li class="list-group-item d-flex justify-content-between" v-for="(member, index) in members">
+              <span>Name: {{member.name}}</span>
+              
+              <span v-if="group.isAdmin">Admin: <input type="checkbox" v-model="member.is_admin" @change="setAdmin(index)"></span>
+              <span v-if="!group.isAdmin && member.is_admin">Administrator</span>
             </li>
           </ul>
         </div>
       </div>
-      <div class="row">
+      <div class="row" v-if="group.isAdmin">
         <div class="col">
           <div class="h5">
             Join requests

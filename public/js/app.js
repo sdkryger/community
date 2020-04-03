@@ -2197,6 +2197,9 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['group'],
   data: function data() {
@@ -38476,109 +38479,131 @@ var render = function() {
             "ul",
             { staticClass: "list-group" },
             _vm._l(_vm.members, function(member, index) {
-              return _c("li", { staticClass: "list-group-item" }, [
-                _vm._v(
-                  "\n            Name: " + _vm._s(member.name) + ", Admin: "
-                ),
-                _c("input", {
-                  directives: [
-                    {
-                      name: "model",
-                      rawName: "v-model",
-                      value: member.is_admin,
-                      expression: "member.is_admin"
-                    }
-                  ],
-                  attrs: { type: "checkbox" },
-                  domProps: {
-                    checked: Array.isArray(member.is_admin)
-                      ? _vm._i(member.is_admin, null) > -1
-                      : member.is_admin
-                  },
-                  on: {
-                    change: [
-                      function($event) {
-                        var $$a = member.is_admin,
-                          $$el = $event.target,
-                          $$c = $$el.checked ? true : false
-                        if (Array.isArray($$a)) {
-                          var $$v = null,
-                            $$i = _vm._i($$a, $$v)
-                          if ($$el.checked) {
-                            $$i < 0 &&
-                              _vm.$set(member, "is_admin", $$a.concat([$$v]))
-                          } else {
-                            $$i > -1 &&
-                              _vm.$set(
-                                member,
-                                "is_admin",
-                                $$a.slice(0, $$i).concat($$a.slice($$i + 1))
-                              )
+              return _c(
+                "li",
+                {
+                  staticClass: "list-group-item d-flex justify-content-between"
+                },
+                [
+                  _c("span", [_vm._v("Name: " + _vm._s(member.name))]),
+                  _vm._v(" "),
+                  _vm.group.isAdmin
+                    ? _c("span", [
+                        _vm._v("Admin: "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: member.is_admin,
+                              expression: "member.is_admin"
+                            }
+                          ],
+                          attrs: { type: "checkbox" },
+                          domProps: {
+                            checked: Array.isArray(member.is_admin)
+                              ? _vm._i(member.is_admin, null) > -1
+                              : member.is_admin
+                          },
+                          on: {
+                            change: [
+                              function($event) {
+                                var $$a = member.is_admin,
+                                  $$el = $event.target,
+                                  $$c = $$el.checked ? true : false
+                                if (Array.isArray($$a)) {
+                                  var $$v = null,
+                                    $$i = _vm._i($$a, $$v)
+                                  if ($$el.checked) {
+                                    $$i < 0 &&
+                                      _vm.$set(
+                                        member,
+                                        "is_admin",
+                                        $$a.concat([$$v])
+                                      )
+                                  } else {
+                                    $$i > -1 &&
+                                      _vm.$set(
+                                        member,
+                                        "is_admin",
+                                        $$a
+                                          .slice(0, $$i)
+                                          .concat($$a.slice($$i + 1))
+                                      )
+                                  }
+                                } else {
+                                  _vm.$set(member, "is_admin", $$c)
+                                }
+                              },
+                              function($event) {
+                                return _vm.setAdmin(index)
+                              }
+                            ]
                           }
-                        } else {
-                          _vm.$set(member, "is_admin", $$c)
-                        }
-                      },
-                      function($event) {
-                        return _vm.setAdmin(index)
-                      }
-                    ]
-                  }
-                })
-              ])
+                        })
+                      ])
+                    : _vm._e(),
+                  _vm._v(" "),
+                  !_vm.group.isAdmin && member.is_admin
+                    ? _c("span", [_vm._v("Administrator")])
+                    : _vm._e()
+                ]
+              )
             }),
             0
           )
         ])
       ]),
       _vm._v(" "),
-      _c("div", { staticClass: "row" }, [
-        _c("div", { staticClass: "col" }, [
-          _c("div", { staticClass: "h5" }, [
-            _vm._v("\n          Join requests\n        ")
-          ]),
-          _vm._v(" "),
-          _c(
-            "ul",
-            { staticClass: "list-group" },
-            _vm._l(_vm.joinRequesters, function(request, index) {
-              return _c("li", { staticClass: "list-group-item" }, [
-                _vm._v(
-                  "\n            Name: " +
-                    _vm._s(request.name) +
-                    " \n            "
-                ),
-                _c(
-                  "div",
-                  {
-                    staticClass: "btn btn-primary",
-                    on: {
-                      click: function($event) {
-                        return _vm.joinRequest("approve", request.id)
-                      }
-                    }
-                  },
-                  [_vm._v("Approve")]
-                ),
-                _vm._v(" "),
-                _c(
-                  "div",
-                  {
-                    staticClass: "btn btn-primary",
-                    on: {
-                      click: function($event) {
-                        return _vm.joinRequest("deny", request.id)
-                      }
-                    }
-                  },
-                  [_vm._v("Deny")]
-                )
-              ])
-            }),
-            0
-          )
-        ])
-      ])
+      _vm.group.isAdmin
+        ? _c("div", { staticClass: "row" }, [
+            _c("div", { staticClass: "col" }, [
+              _c("div", { staticClass: "h5" }, [
+                _vm._v("\n          Join requests\n        ")
+              ]),
+              _vm._v(" "),
+              _c(
+                "ul",
+                { staticClass: "list-group" },
+                _vm._l(_vm.joinRequesters, function(request, index) {
+                  return _c("li", { staticClass: "list-group-item" }, [
+                    _vm._v(
+                      "\n            Name: " +
+                        _vm._s(request.name) +
+                        " \n            "
+                    ),
+                    _c(
+                      "div",
+                      {
+                        staticClass: "btn btn-primary",
+                        on: {
+                          click: function($event) {
+                            return _vm.joinRequest("approve", request.id)
+                          }
+                        }
+                      },
+                      [_vm._v("Approve")]
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "div",
+                      {
+                        staticClass: "btn btn-primary",
+                        on: {
+                          click: function($event) {
+                            return _vm.joinRequest("deny", request.id)
+                          }
+                        }
+                      },
+                      [_vm._v("Deny")]
+                    )
+                  ])
+                }),
+                0
+              )
+            ])
+          ])
+        : _vm._e()
     ])
   ])
 }
@@ -38621,7 +38646,6 @@ var render = function() {
                   "a",
                   {
                     staticClass: "list-group-item list-group-item-action",
-                    class: { disabled: !group.isAdmin },
                     attrs: { href: "/groups/" + group.id }
                   },
                   [

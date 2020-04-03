@@ -94,10 +94,11 @@ class GroupController extends Controller
       $response->group = $group;
       $user = Auth::user();
       $response->user = $user;
-      $groupUser = GroupUser::where('group_id',$group->id)->where('user_id',$user->id)->where('is_admin',1)->first();
+      $groupUser = GroupUser::where('group_id',$group->id)->where('user_id',$user->id)->first();
       if($groupUser){
         $response->error = false;
         $response->message = "this is your group";
+        $group->isAdmin = $groupUser->is_admin == '1';
       }else{
         $response->message = "this is not your group";
         return redirect('/home');
@@ -157,7 +158,7 @@ class GroupController extends Controller
       $response->error = true;
       $response->message = 'Not group admin';
       $user_id = Auth::user()->id;
-      $groupUser = GroupUser::where('group_id',$id)->where('user_id',$user_id)->where('is_admin',1)->first();
+      $groupUser = GroupUser::where('group_id',$id)->where('user_id',$user_id)->first();
       if($groupUser){
         //user is admin of the group
         $response->error = false;

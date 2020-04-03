@@ -8,7 +8,7 @@
           </div>
           <div class="card-body">
             <div class="list-group list-group-flush" v-for="group in groups">
-              <a :href="'/groups/'+group.id" class="list-group-item list-group-item-action" :class="{ disabled: !group.isAdmin}">
+              <a :href="'/groups/'+group.id" class="list-group-item list-group-item-action">
                 <span>{{group.name}} </span>
                 <span v-if="group.isAdmin" class="badge badge-pill badge-primary">Admin</span>
                 <span v-if="group.joinRequests > 0" class="badge badge-pill badge-primary">Join requests: {{group.joinRequests}}</span>
