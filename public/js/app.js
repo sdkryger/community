@@ -2499,7 +2499,7 @@ __webpack_require__.r(__webpack_exports__);
         dataType: 'json'
       }).done(function (data) {
         console.log(JSON.stringify(data));
-        if (data.id) window.open('/resources/' + data.id, '_self');
+        if (data.id) window.open('/resources/view/' + data.id, '_self');
       });
     }
   }

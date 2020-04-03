@@ -116,7 +116,7 @@
           .done(function(data){
             console.log(JSON.stringify(data));
             if(data.id)
-              window.open('/resources/'+data.id,'_self');
+              window.open('/resources/view/'+data.id,'_self');
         });
       }
     }

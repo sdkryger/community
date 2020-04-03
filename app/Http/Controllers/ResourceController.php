@@ -390,8 +390,11 @@ class ResourceController extends Controller
         }
       }
     }
+    $resource = Resource::where('id',$id)->first();
+    if($resource->user_id == $user->id)
+      $access = true;
     if($access){
-      $resource = Resource::where('id',$id)->first();
+      
 
       return $resource->images;
     }else
