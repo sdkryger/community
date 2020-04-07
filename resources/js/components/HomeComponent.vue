@@ -52,7 +52,7 @@
             <div class="list-group list-group-flush">
               <div v-for="request in myRequests" 
                 class="list-group-item list-group-item-action">
-                <span>{{request.resource.title}} - {{request.start_time.substr(0,10)}} to {{request.end_time.substr(0,10)}}</span>
+                <span>{{request.resource.title}} (Owned by: {{request.ownedBy}}) - {{request.start_time.substr(0,10)}} to {{request.end_time.substr(0,10)}}</span>
                 <span v-if="request.approved" class="badge badge-pill badge-success">Approved</span>
                 <span v-if="request.deleted_at" class="badge badge-pill badge-danger">Rejected</span>
                 <span v-if="!request.approved && !request.deleted_at" class="badge badge-pill badge-primary">Pending</span>

@@ -38866,7 +38866,9 @@ var render = function() {
                     _c("span", [
                       _vm._v(
                         _vm._s(request.resource.title) +
-                          " - " +
+                          " (Owned by: " +
+                          _vm._s(request.ownedBy) +
+                          ") - " +
                           _vm._s(request.start_time.substr(0, 10)) +
                           " to " +
                           _vm._s(request.end_time.substr(0, 10))
@@ -39226,7 +39228,13 @@ var render = function() {
                 ])
               ]
             : _c("div", { staticClass: "col" }, [
-                _c("h4", [_vm._v(_vm._s(_vm.resource.title))]),
+                _c("h4", [
+                  _vm._v(
+                    _vm._s(_vm.resource.title) +
+                      " - Group: " +
+                      _vm._s(_vm.resource.group)
+                  )
+                ]),
                 _vm._v(" "),
                 _c("p", [_vm._v(_vm._s(_vm.resource.description))])
               ])

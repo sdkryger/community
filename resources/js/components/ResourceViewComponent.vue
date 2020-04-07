@@ -13,7 +13,7 @@
           </div>
         </template>
         <div class="col" v-else>
-          <h4>{{resource.title}}</h4>
+          <h4>{{resource.title}} - Group: {{resource.group}}</h4>
           <p>{{resource.description}}</p>
         </div>
       </div>

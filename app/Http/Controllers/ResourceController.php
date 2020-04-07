@@ -216,17 +216,22 @@ class ResourceController extends Controller
   public function show($id){
     $user = Auth::user();
     $groups = $user->groups();
+    $resourceGroup = null;
     $access = false;
     foreach($groups as $group){
       $resources = $group->resources;
       foreach($resources as $resource){
-        if($resource->id == $id)
+        if($resource->id == $id){
           $access = true;
+          $resourceGroup = $group;
+        }
+          
       }
     }
     $resource = Resource::where('id',$id)->first();
     if($resource && $access || $resource->user_id == $user->id){
       $resource->owner = $resource->user_id == $user->id;
+      $resource->group = $resourceGroup->name;
       return view('resourceView',['resource'=>$resource]);
     }else{
         abort(403, 'Unauthorized action.');
@@ -346,8 +351,11 @@ class ResourceController extends Controller
 
   public function myRequests(){
     $requests = ResourceSchedule::withTrashed()->where('user_id',Auth()->user()->id)->get();
-    foreach($requests as $request)
+    foreach($requests as $request){
       $request->resource;
+      $request->ownedBy = User::where('id',$request->resource->user_id)->first()->name;
+    }
+      
     return $requests;
   }
 
