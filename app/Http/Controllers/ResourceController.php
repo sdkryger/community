@@ -231,7 +231,10 @@ class ResourceController extends Controller
     $resource = Resource::where('id',$id)->first();
     if($resource && $access || $resource->user_id == $user->id){
       $resource->owner = $resource->user_id == $user->id;
-      $resource->group = $resourceGroup->name;
+      if($resourceGroup)
+        $resource->group = $resourceGroup->name;
+      else 
+        $resource->group = 'assigned to no groups';
       return view('resourceView',['resource'=>$resource]);
     }else{
         abort(403, 'Unauthorized action.');
