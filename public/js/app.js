@@ -2634,6 +2634,13 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -2826,6 +2833,98 @@ __webpack_require__.r(__webpack_exports__);
         dataType: 'json'
       }).done(function () {
         if (data.error) alert(data.message);
+      });
+    },
+    upload: function upload(event) {
+      var self = this;
+      var file = event.target.files[0];
+      event.target.value = '';
+      console.log("The file is: " + file);
+      if (file.type.match(/image.*/)) console.log("Is an image");
+      var reader = new FileReader();
+
+      reader.onerror = function (readerEvent) {
+        console.log("reader error");
+      };
+
+      reader.onload = function (readerEvent) {
+        console.log("reader onLoad");
+        var image = new Image();
+
+        image.onload = function (imageEvent) {
+          var canvas = document.createElement('canvas');
+          var max_size = 500;
+          var width = image.width;
+          var height = image.height;
+
+          if (width > height) {
+            if (width > max_size) {
+              height *= max_size / width;
+              width = max_size;
+            }
+          } else {
+            if (height > max_size) {
+              width *= max_size / height;
+              height = max_size;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          canvas.getContext('2d').drawImage(image, 0, 0, width, height);
+          var dataUrl = canvas.toDataURL('image/jpeg');
+          var resizedImage = self.dataURLToBlob(dataUrl);
+          self.sendImage(resizedImage);
+        };
+
+        image.src = readerEvent.target.result;
+      };
+
+      reader.readAsDataURL(file);
+      console.log("should have read file");
+    },
+    dataURLToBlob: function dataURLToBlob(dataURL) {
+      var BASE64_MARKER = ';base64,';
+
+      if (dataURL.indexOf(BASE64_MARKER) == -1) {
+        var parts = dataURL.split(',');
+        var contentType = parts[0].split(':')[1];
+        var raw = parts[1];
+        return new Blob([raw], {
+          type: contentType
+        });
+      }
+
+      var parts = dataURL.split(BASE64_MARKER);
+      var contentType = parts[0].split(':')[1];
+      var raw = window.atob(parts[1]);
+      var rawLength = raw.length;
+      var uInt8Array = new Uint8Array(rawLength);
+
+      for (var i = 0; i < rawLength; ++i) {
+        uInt8Array[i] = raw.charCodeAt(i);
+      }
+
+      return new Blob([uInt8Array], {
+        type: contentType
+      });
+    },
+    sendImage: function sendImage(blob) {
+      var self = this;
+      console.log("Will try to send data...");
+      var data = new FormData($("form[id*='uploadImageForm']")[0]);
+      data.append('file', blob);
+      $.ajax({
+        url: '/resources/addImage',
+        data: data,
+        cache: false,
+        contentType: false,
+        processData: false,
+        type: 'POST',
+        success: function success(data) {
+          //console.log(JSON.stringify(data));
+          self.getResourceImages();
+        }
       });
     }
   },
@@ -39187,67 +39286,82 @@ var render = function() {
           }),
           _vm._v(" "),
           this.resource.owner
-            ? _c(
-                "form",
-                {
-                  staticClass: "col-12 border border-secondary p-2",
-                  attrs: {
-                    action: "/resources/addImage",
-                    method: "post",
-                    enctype: "multipart/form-data"
-                  }
-                },
-                [
-                  _vm._m(0),
+            ? [
+                _c("div", { staticClass: "w-100" }),
+                _vm._v(" "),
+                _c("div", { staticClass: "col bg-primary text-white" }, [
+                  _c("div", { staticClass: "form-group" }, [
+                    _c("label", [_vm._v("Add image")]),
+                    _vm._v(" "),
+                    _c("input", {
+                      staticClass: "form-control",
+                      attrs: { type: "file", name: "file", accept: "image/*" },
+                      on: { change: _vm.upload }
+                    })
+                  ]),
                   _vm._v(" "),
-                  _c("input", {
-                    directives: [
-                      {
-                        name: "model",
-                        rawName: "v-model",
-                        value: _vm.csrf,
-                        expression: "csrf"
-                      }
-                    ],
-                    attrs: { type: "hidden", name: "_token" },
-                    domProps: { value: _vm.csrf },
-                    on: {
-                      input: function($event) {
-                        if ($event.target.composing) {
-                          return
-                        }
-                        _vm.csrf = $event.target.value
-                      }
-                    }
-                  }),
-                  _vm._v(" "),
-                  _c("input", {
-                    directives: [
-                      {
-                        name: "model",
-                        rawName: "v-model",
-                        value: _vm.resource.id,
-                        expression: "resource.id"
-                      }
-                    ],
-                    attrs: { type: "hidden", name: "resourceId" },
-                    domProps: { value: _vm.resource.id },
-                    on: {
-                      input: function($event) {
-                        if ($event.target.composing) {
-                          return
-                        }
-                        _vm.$set(_vm.resource, "id", $event.target.value)
-                      }
-                    }
-                  }),
-                  _vm._v(" "),
-                  _c("input", {
-                    staticClass: "btn btn-primary",
-                    attrs: { type: "submit", value: "Ok" }
-                  })
-                ]
-              )
+                  this.resource.owner
+                    ? _c(
+                        "form",
+                        {
+                          attrs: {
+                            id: "uploadImageForm",
+                            action: "/resources/addImage",
+                            method: "post",
+                            enctype: "multipart/form-data"
+                          }
+                        },
+                        [
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.csrf,
+                                expression: "csrf"
+                              }
+                            ],
+                            attrs: { type: "hidden", name: "_token" },
+                            domProps: { value: _vm.csrf },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.csrf = $event.target.value
+                              }
+                            }
+                          }),
+                          _vm._v(" "),
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.resource.id,
+                                expression: "resource.id"
+                              }
+                            ],
+                            attrs: { type: "hidden", name: "resourceId" },
+                            domProps: { value: _vm.resource.id },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.$set(
+                                  _vm.resource,
+                                  "id",
+                                  $event.target.value
+                                )
+                              }
+                            }
+                          })
+                        ]
+                      )
+                    : _vm._e()
+                ])
+              ]
             : _vm._e()
         ],
         2
@@ -39474,7 +39588,7 @@ var render = function() {
           { staticClass: "modal-dialog", attrs: { role: "document" } },
           [
             _c("div", { staticClass: "modal-content" }, [
-              _vm._m(1),
+              _vm._m(0),
               _vm._v(" "),
               _c("div", { staticClass: "modal-body" }, [
                 _vm.scheduleItemIndex != -1
@@ -39567,19 +39681,6 @@ var render = function() {
   ])
 }
 var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "form-group" }, [
-      _c("label", [_vm._v("Add image")]),
-      _vm._v(" "),
-      _c("input", {
-        staticClass: "form-control",
-        attrs: { type: "file", name: "file", accept: "image/*" }
-      })
-    ])
-  },
   function() {
     var _vm = this
     var _h = _vm.$createElement

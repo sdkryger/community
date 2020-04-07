@@ -28,15 +28,22 @@
           <img :src="'/'+image.path" style="max-width:80px;max-height:80px;" class="m-1"
             :class="[index == activeImageIndex ? 'border border-danger' : '']" @click="setImageIndex(index)">
         </div>
-        <form action="/resources/addImage" class="col-12 border border-secondary p-2" method="post" enctype="multipart/form-data" v-if="this.resource.owner">
-          <div class="form-group">
-            <label>Add image</label>
-            <input type="file" name="file" class="form-control"  accept="image/*">
+        <template v-if="this.resource.owner">
+          <div class="w-100"></div>
+          <div class="col bg-primary text-white">
+            <div class="form-group">
+              <label>Add image</label>
+              <input type="file" name="file" class="form-control"  accept="image/*" @change="upload">
+            </div>
+            <form id="uploadImageForm" action="/resources/addImage"  method="post" enctype="multipart/form-data" v-if="this.resource.owner">
+              
+              <input type="hidden" v-model="csrf" name="_token">
+              <input type="hidden" v-model="resource.id" name="resourceId">
+            </form>
           </div>
-          <input type="hidden" v-model="csrf" name="_token">
-          <input type="hidden" v-model="resource.id" name="resourceId">
-          <input type="submit" value="Ok" class="btn btn-primary">
-        </form>
+
+        </template>
+        
       </div>
       <div class="row border border-secondary mt-1 mb-1">
         <div class="col h3 mt-3">
@@ -348,6 +355,89 @@
               if(data.error)
                 alert(data.message);
           });
+      },
+      upload(event){
+        var self = this;
+        var file=event.target.files[0];
+        event.target.value = '';
+        console.log("The file is: "+file);
+        if(file.type.match(/image.*/))  
+          console.log("Is an image");
+        var reader = new FileReader();
+        reader.onerror = function(readerEvent){
+          console.log("reader error");
+        };
+        reader.onload = function(readerEvent){
+          console.log("reader onLoad");
+          var image = new Image();
+          image.onload = function(imageEvent){
+            var canvas = document.createElement('canvas');
+            var max_size = 500;
+            var width = image.width;
+            var height = image.height;
+            if (width > height){
+              if(width > max_size){
+                height *= max_size / width;
+                width = max_size;
+              }
+            }else{
+              if(height > max_size){
+                width *= max_size / height;
+                height = max_size;
+              }
+            }
+            canvas.width = width;
+            canvas.height = height;
+            canvas.getContext('2d').drawImage(image,0,0,width,height);
+            var dataUrl = canvas.toDataURL('image/jpeg');
+            var resizedImage = self.dataURLToBlob(dataUrl);
+            self.sendImage(resizedImage);
+          };
+          image.src = readerEvent.target.result;
+        };
+        reader.readAsDataURL(file);
+        console.log("should have read file");
+      },
+      dataURLToBlob(dataURL){
+        var BASE64_MARKER = ';base64,';
+        if (dataURL.indexOf(BASE64_MARKER) == -1) {
+          var parts = dataURL.split(',');
+          var contentType = parts[0].split(':')[1];
+          var raw = parts[1];
+
+          return new Blob([raw], {type: contentType});
+        }
+
+        var parts = dataURL.split(BASE64_MARKER);
+        var contentType = parts[0].split(':')[1];
+        var raw = window.atob(parts[1]);
+        var rawLength = raw.length;
+
+        var uInt8Array = new Uint8Array(rawLength);
+
+        for (var i = 0; i < rawLength; ++i) {
+          uInt8Array[i] = raw.charCodeAt(i);
+        }
+
+        return new Blob([uInt8Array], {type: contentType});
+      },
+      sendImage(blob){
+        var self  = this;
+        console.log("Will try to send data...");
+        var data = new FormData($("form[id*='uploadImageForm']")[0]);
+        data.append('file',blob);
+        $.ajax({
+          url:'/resources/addImage',
+          data:data,
+          cache:false,
+          contentType:false,
+          processData:false,
+          type:'POST',
+          success:function(data){
+            //console.log(JSON.stringify(data));
+            self.getResourceImages();
+          }
+        });
       }
     },
     computed:{
