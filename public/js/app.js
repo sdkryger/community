@@ -2631,6 +2631,9 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -39132,13 +39135,14 @@ var render = function() {
         2
       ),
       _vm._v(" "),
-      _c("div", { staticClass: "row" }, [
-        _c(
-          "div",
-          { staticClass: "col-12" },
-          [
+      _c(
+        "div",
+        { staticClass: "row" },
+        [
+          _c("div", { staticClass: "col-12" }, [
             _vm.images.length > 0
               ? _c("img", {
+                  staticClass: "img-fluid",
                   staticStyle: { "max-height": "300px" },
                   attrs: { src: "/" + _vm.images[_vm.activeImageIndex].path }
                 })
@@ -39159,10 +39163,14 @@ var render = function() {
                   [_vm._v("Delete")]
                 )
               : _vm._e(),
-            _c("br"),
-            _vm._v(" "),
-            _vm._l(_vm.images, function(image, index) {
-              return _c("img", {
+            _c("br")
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "w-100" }),
+          _vm._v(" "),
+          _vm._l(_vm.images, function(image, index) {
+            return _c("div", { staticClass: "col" }, [
+              _c("img", {
                 staticClass: "m-1",
                 class: [
                   index == _vm.activeImageIndex ? "border border-danger" : ""
@@ -39175,75 +39183,75 @@ var render = function() {
                   }
                 }
               })
-            })
-          ],
-          2
-        ),
-        _vm._v(" "),
-        this.resource.owner
-          ? _c(
-              "form",
-              {
-                staticClass: "col-12 border border-secondary p-2",
-                attrs: {
-                  action: "/resources/addImage",
-                  method: "post",
-                  enctype: "multipart/form-data"
-                }
-              },
-              [
-                _vm._m(0),
-                _vm._v(" "),
-                _c("input", {
-                  directives: [
-                    {
-                      name: "model",
-                      rawName: "v-model",
-                      value: _vm.csrf,
-                      expression: "csrf"
-                    }
-                  ],
-                  attrs: { type: "hidden", name: "_token" },
-                  domProps: { value: _vm.csrf },
-                  on: {
-                    input: function($event) {
-                      if ($event.target.composing) {
-                        return
-                      }
-                      _vm.csrf = $event.target.value
-                    }
+            ])
+          }),
+          _vm._v(" "),
+          this.resource.owner
+            ? _c(
+                "form",
+                {
+                  staticClass: "col-12 border border-secondary p-2",
+                  attrs: {
+                    action: "/resources/addImage",
+                    method: "post",
+                    enctype: "multipart/form-data"
                   }
-                }),
-                _vm._v(" "),
-                _c("input", {
-                  directives: [
-                    {
-                      name: "model",
-                      rawName: "v-model",
-                      value: _vm.resource.id,
-                      expression: "resource.id"
-                    }
-                  ],
-                  attrs: { type: "hidden", name: "resourceId" },
-                  domProps: { value: _vm.resource.id },
-                  on: {
-                    input: function($event) {
-                      if ($event.target.composing) {
-                        return
+                },
+                [
+                  _vm._m(0),
+                  _vm._v(" "),
+                  _c("input", {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.csrf,
+                        expression: "csrf"
                       }
-                      _vm.$set(_vm.resource, "id", $event.target.value)
+                    ],
+                    attrs: { type: "hidden", name: "_token" },
+                    domProps: { value: _vm.csrf },
+                    on: {
+                      input: function($event) {
+                        if ($event.target.composing) {
+                          return
+                        }
+                        _vm.csrf = $event.target.value
+                      }
                     }
-                  }
-                }),
-                _vm._v(" "),
-                _c("input", {
-                  staticClass: "btn btn-primary",
-                  attrs: { type: "submit", value: "Ok" }
-                })
-              ]
-            )
-          : _vm._e()
-      ]),
+                  }),
+                  _vm._v(" "),
+                  _c("input", {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.resource.id,
+                        expression: "resource.id"
+                      }
+                    ],
+                    attrs: { type: "hidden", name: "resourceId" },
+                    domProps: { value: _vm.resource.id },
+                    on: {
+                      input: function($event) {
+                        if ($event.target.composing) {
+                          return
+                        }
+                        _vm.$set(_vm.resource, "id", $event.target.value)
+                      }
+                    }
+                  }),
+                  _vm._v(" "),
+                  _c("input", {
+                    staticClass: "btn btn-primary",
+                    attrs: { type: "submit", value: "Ok" }
+                  })
+                ]
+              )
+            : _vm._e()
+        ],
+        2
+      ),
       _vm._v(" "),
       _c(
         "div",
@@ -39568,7 +39576,7 @@ var staticRenderFns = [
       _vm._v(" "),
       _c("input", {
         staticClass: "form-control",
-        attrs: { type: "file", name: "file" }
+        attrs: { type: "file", name: "file", accept: "image/*" }
       })
     ])
   },

@@ -20,15 +20,18 @@
       <div class="row">
         
         <div class="col-12">
-          <img :src="'/'+images[activeImageIndex].path" v-if="images.length > 0" style="max-height:300px;"><br>
+          <img :src="'/'+images[activeImageIndex].path" v-if="images.length > 0" style="max-height:300px;" class="img-fluid"><br>
           <div class="btn btn-secondary m-1" @click="deleteImage()" v-if="resource.owner">Delete</div><br>
-          <img v-for="(image, index) in images" :src="'/'+image.path" style="max-width:80px;max-height:80px;" class="m-1"
+        </div>
+        <div class="w-100"></div>
+        <div class="col" v-for="(image, index) in images" >
+          <img :src="'/'+image.path" style="max-width:80px;max-height:80px;" class="m-1"
             :class="[index == activeImageIndex ? 'border border-danger' : '']" @click="setImageIndex(index)">
         </div>
         <form action="/resources/addImage" class="col-12 border border-secondary p-2" method="post" enctype="multipart/form-data" v-if="this.resource.owner">
           <div class="form-group">
             <label>Add image</label>
-            <input type="file" name="file" class="form-control">
+            <input type="file" name="file" class="form-control"  accept="image/*">
           </div>
           <input type="hidden" v-model="csrf" name="_token">
           <input type="hidden" v-model="resource.id" name="resourceId">
